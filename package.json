@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@mysten-incubation/memwal": "^0.1.1",
+    "@mysten/sui": "^2.24.0",
+    "zod": "^3.25.76"
+  }
+}
