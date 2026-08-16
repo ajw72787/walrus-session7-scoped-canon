@@ -1,0 +1,22 @@
+{
+  "dateTime": "2026-08-16T08:20:20-04:00",
+  "timeZone": "America/New_York",
+  "promptMode": "original",
+  "promptPath": "../prompts/continuity-keeper-original.md",
+  "promptRepositoryPath": "prompts/continuity-keeper-original.md",
+  "originalPromptSha256": "cff58abecfe2c2fa485a87fc46b3bb7e7529fd1f0c56781e3955a0d1e6007e88",
+  "application": {"framework": "Next.js 16.3.0", "openaiConfigured": true, "openaiModel": "gpt-5.6", "memwalConfigured": true, "memwalServerUrlConfigured": true},
+  "memwalHealth": {"status": "ok", "version": "0.1.0", "relayerVersion": "0.1.0", "apiVersion": "1.0.0", "buildCommit": "3ca4b4c0ff41976a4190a08783234e0c549d2a53"},
+  "namespace": "session7-baseline-pickles",
+  "conversationIds": {"step1": null, "steps2Through6": null, "note": "Direct API execution; the chat API does not issue conversation IDs. Step 2 began with an empty history."},
+  "experimentStepsCompleted": [1, 2, 3, 4, 5, 6],
+  "pirateWorldFinalizationAccepted": false,
+  "pirateWorldFinalizationNote": "The one allowed finalization request returned an empty transport response and was not retried.",
+  "infrastructureErrors": [
+    "Four initial jobs reported durable Walrus upload failures caused by insufficient SUI balance; one initial job completed.",
+    "Five jobs from the required Step 1 finalization failed because the seal/encrypt sidecar at localhost:9000 was unavailable.",
+    "Step 3 finalization remember_bulk returned HTTP 429: delegate_key rate limit exceeded (30 weighted-requests/min; retry_after_seconds 60).",
+    "The Step 4 finalization request returned an empty transport response."
+  ],
+  "secretsIncluded": false
+}

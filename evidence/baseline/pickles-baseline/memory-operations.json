@@ -1,0 +1,108 @@
+{
+  "namespaceCleanlinessPreflight": [
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","query":"Pickles","result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::zorp","query":"Zorp","result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::relationships","query":"Pickles Zorp relationships","result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::events","query":"Pickles Space World Pirate World","result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::timeline","query":"Pickles Space World Pirate World","result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::space-world","query":"Space World","result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::pirate-world","query":"Pirate World","result":[]}
+  ],
+  "step1SlugResponse": {
+    "operations": [
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — a small purple dragon (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — curious and playful (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — loves pizza (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — afraid of chickens (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"remember_bulk","namespace":"session7-baseline-pickles","input":{"facts":[
+        {"text":"[canon:char] Pickles — a small purple dragon (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — curious and playful (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — loves pizza (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — afraid of chickens (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"}
+      ]},"result":{"job_ids":["1b844d2c-69aa-4427-90cc-076d8118f2e5","53c20a15-0c83-4567-ab36-15346a268658","6a2f857e-8bec-4265-9075-fcab1fdd526c","2fd36d50-d4b0-4c3a-bc5f-3c884eda332a","b9cf825d-7c91-4268-bb0b-ee7e845daaba"],"total":5,"status":"running","state":"submitted"}}
+    ]
+  },
+  "step1Finalization": {
+    "operations": [
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — a small purple dragon (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — curious and playful (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — loves pizza (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — afraid of chickens (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+      {"operation":"remember_bulk","namespace":"session7-baseline-pickles","input":{"facts":[
+        {"text":"[canon:char] Pickles — a small purple dragon (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — curious and playful (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — loves pizza (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"},
+        {"text":"[canon:char] Pickles — afraid of chickens (as of: character setup)","namespace":"session7-baseline-pickles::char::pickles"}
+      ]},"result":{"job_ids":["1127be8a-9b35-46f3-b8c6-88a96ee2934a","b468a38e-7d32-4392-a301-7031be7521ee","967e9924-7067-4b9b-965b-d0ef83ce97b7","3644c7da-7e56-4827-97b7-8b90c6acd59b","70f0a55f-0a00-41e9-8375-b694365f4729"],"total":5,"status":"running","state":"submitted"}}
+    ]
+  },
+  "step1JobInspection": [
+    {"jobId":"1b844d2c-69aa-4427-90cc-076d8118f2e5","state":"running","error":"Internal Error: durable Walrus upload failed (503 Service Unavailable): {\"error\":\"Unable to perform gas selection due to insufficient SUI balance (in address balance or coins) for account 0x58b4e451e0f1841a980dc6fad023296bbbfb48def779a12bcedf7f77b3cdbe3a to satisfy required budget 7254792.\",\"code\":\"NO_SIDE_EFFECT\",\"traceId\":\"8ba038c6-cf91-4841-90dc-a82ff1894d46\"}"},
+    {"jobId":"53c20a15-0c83-4567-ab36-15346a268658","state":"running","error":"Internal Error: durable Walrus upload failed (503 Service Unavailable): {\"error\":\"Unable to perform gas selection due to insufficient SUI balance (in address balance or coins) for account 0x9b5c60c6cc6e0086e8315569db214b3b2e70584cb0b906f9c2545c36207c4b56 to satisfy required budget 7254792.\",\"code\":\"NO_SIDE_EFFECT\",\"traceId\":\"0e940bbd-7c06-4c33-962a-76e170b6a052\"}"},
+    {"jobId":"6a2f857e-8bec-4265-9075-fcab1fdd526c","state":"completed","blobId":"M8qypDBBfpkxMxRTgtQGEXdDOviQs55ENJxgHnJbElc"},
+    {"jobId":"2fd36d50-d4b0-4c3a-bc5f-3c884eda332a","state":"running","error":"Internal Error: durable Walrus upload failed (503 Service Unavailable): {\"error\":\"Unable to perform gas selection due to insufficient SUI balance (in address balance or coins) for account 0x1e9c39d8a9a9c3b37ab234ee6b6c50b3788fb30b8b3d31e67fa0dcea786041f7 to satisfy required budget 7254792.\",\"code\":\"NO_SIDE_EFFECT\",\"traceId\":\"eab86f3e-118b-4fc9-8875-361e5773c52f\"}"},
+    {"jobId":"b9cf825d-7c91-4268-bb0b-ee7e845daaba","state":"running","error":"Internal Error: durable Walrus upload failed (503 Service Unavailable): {\"error\":\"Unable to perform gas selection due to insufficient SUI balance (in address balance or coins) for account 0x5791bc159c67c29e4f4c11d1f41e60c08ebfb736c49c917ce1422256e356aa59 to satisfy required budget 7254792.\",\"code\":\"NO_SIDE_EFFECT\",\"traceId\":\"e922cfff-9ff5-4b65-b60e-e9a21b84c721\"}"},
+    {"jobId":"1127be8a-9b35-46f3-b8c6-88a96ee2934a","state":"failed","error":"Internal Error: Sidecar seal/encrypt request failed: error sending request for url (http://localhost:9000/seal/encrypt). Is the sidecar running?"},
+    {"jobId":"b468a38e-7d32-4392-a301-7031be7521ee","state":"failed","error":"Internal Error: Sidecar seal/encrypt request failed: error sending request for url (http://localhost:9000/seal/encrypt). Is the sidecar running?"},
+    {"jobId":"967e9924-7067-4b9b-965b-d0ef83ce97b7","state":"failed","error":"Internal Error: Sidecar seal/encrypt request failed: error sending request for url (http://localhost:9000/seal/encrypt). Is the sidecar running?"},
+    {"jobId":"3644c7da-7e56-4827-97b7-8b90c6acd59b","state":"failed","error":"Internal Error: Sidecar seal/encrypt request failed: error sending request for url (http://localhost:9000/seal/encrypt). Is the sidecar running?"},
+    {"jobId":"70f0a55f-0a00-41e9-8375-b694365f4729","state":"failed","error":"Internal Error: Sidecar seal/encrypt request failed: error sending request for url (http://localhost:9000/seal/encrypt). Is the sidecar running?"}
+  ],
+  "step2FreshConversation": [
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"Who is Pickles? Identity, traits, role, appearance, relationships, abilities, and current state.","namespace":"session7-baseline-pickles::char::pickles","limit":10},"result":[{"blob_id":"M8qypDBBfpkxMxRTgtQGEXdDOviQs55ENJxgHnJbElc","text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","distance":0.4796500374986006}]}
+  ],
+  "step3SpaceWorld": [
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"Pickles identity, abilities, home, relationships, and current state, including any alternate realities","namespace":"session7-baseline-pickles::char::pickles","limit":10},"result":[{"blob_id":"M8qypDBBfpkxMxRTgtQGEXdDOviQs55ENJxgHnJbElc","text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","distance":0.48480415929278287}]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::space-world","input":{"query":"Space World alternate reality, its rules, and established facts","namespace":"session7-baseline-pickles::place::space-world","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::mars","input":{"query":"Mars and who lives there in Space World","namespace":"session7-baseline-pickles::place::mars","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::zorp","input":{"query":"Zorp identity, appearance, disposition, home, relationships, and current state","namespace":"session7-baseline-pickles::char::zorp","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::relationships","input":{"query":"Pickles and Zorp friendship in Space World","namespace":"session7-baseline-pickles::relationships","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::space-world","input":{"query":"[canon:place] Space World — an alternate reality (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::place::space-world","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — lives on Mars in the Space World alternate reality (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::char::pickles","limit":10},"result":[{"blob_id":"M8qypDBBfpkxMxRTgtQGEXdDOviQs55ENJxgHnJbElc","text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","distance":0.2931386165508336}]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::zorp","input":{"query":"[canon:char] Zorp — a friendly green alien in Space World (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::char::zorp","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::relationships","input":{"query":"[canon:relationship] Pickles and Zorp — best friends in the Space World alternate reality (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::relationships","limit":10},"result":[]},
+    {"operation":"remember_bulk","namespace":"session7-baseline-pickles","input":{"facts":[
+      {"text":"[canon:place] Space World — an alternate reality (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::place::space-world"},
+      {"text":"[canon:char] Pickles — lives on Mars in the Space World alternate reality (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::char::pickles"},
+      {"text":"[canon:char] Zorp — a friendly green alien in Space World (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::char::zorp"},
+      {"text":"[canon:relationship] Pickles and Zorp — best friends in the Space World alternate reality (as of: alternate-reality setup)","namespace":"session7-baseline-pickles::relationships"}
+    ]},"result":{"job_ids":["cb79a482-88be-49b6-9a2d-4d09151e222b","e0fc355a-863c-4945-9f93-f2a136b6dcb7","08500797-2d6d-4a2e-adb5-c88022fa2b26","a292e376-6acf-4afe-9a83-0564538cdee2"],"total":4,"status":"running","state":"submitted"}}
+  ],
+  "step3Finalization": [
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::space-world","input":{"query":"[canon:place] Space World — an alternate reality where Pickles lives on Mars and Zorp is Pickles' best friend (as of: Space World scene)","namespace":"session7-baseline-pickles::place::space-world","limit":3},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — lives on Mars in the alternate reality Space World (as of: Space World scene)","namespace":"session7-baseline-pickles::char::pickles","limit":3},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::zorp","input":{"query":"[canon:char] Zorp — a friendly green alien in Space World (as of: Space World scene)","namespace":"session7-baseline-pickles::char::zorp","limit":3},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::relationships","input":{"query":"[canon:relationship] Pickles and Zorp — best friends in Space World (as of: Space World scene)","namespace":"session7-baseline-pickles::relationships","limit":3},"result":[]},
+    {"operation":"remember_bulk","namespace":"session7-baseline-pickles","input":{"facts":[
+      {"text":"[canon:place] Space World — an alternate reality where Pickles lives on Mars and Zorp is Pickles' best friend (as of: Space World scene)","namespace":"session7-baseline-pickles::place::space-world"},
+      {"text":"[canon:char] Pickles — lives on Mars in the alternate reality Space World (as of: Space World scene)","namespace":"session7-baseline-pickles::char::pickles"},
+      {"text":"[canon:char] Zorp — a friendly green alien in Space World (as of: Space World scene)","namespace":"session7-baseline-pickles::char::zorp"},
+      {"text":"[canon:relationship] Pickles and Zorp — best friends in Space World (as of: Space World scene)","namespace":"session7-baseline-pickles::relationships"}
+    ]},"error":"Walrus Memory server error (429): {\"error\":\"Rate limit exceeded\",\"layer\":\"delegate_key\",\"limit\":\"30 weighted-requests/min\",\"retry_after_seconds\":60}"}
+  ],
+  "step4PirateWorld": [
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"Pickles current identity, abilities, location, and reality-specific variants, including Space World","namespace":"session7-baseline-pickles::char::pickles","limit":10},"result":[{"blob_id":"M8qypDBBfpkxMxRTgtQGEXdDOviQs55ENJxgHnJbElc","text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","distance":0.49331695059098135}]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::space-world","input":{"query":"Space World alternate reality and its separation from other realities","namespace":"session7-baseline-pickles::place::space-world","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::zorp","input":{"query":"Zorp identity and relationship with Pickles in Space World","namespace":"session7-baseline-pickles::char::zorp","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::rule::alternate-realities","input":{"query":"Established alternate-reality rules and whether variants have separate histories and abilities","namespace":"session7-baseline-pickles::rule::alternate-realities","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::relationships","input":{"query":"Pickles and Zorp relationship, including reality-specific status","namespace":"session7-baseline-pickles::relationships","limit":10},"result":[]}
+  ],
+  "step4Finalization": {"transportResponse":"","retried":false,"observedOperations":[],"error":"Empty transport response"},
+  "step5PirateQuestion": [
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — current identity, history, abilities, and state in Pirate World","namespace":"session7-baseline-pickles::char::pickles","limit":10},"result":[{"blob_id":"M8qypDBBfpkxMxRTgtQGEXdDOviQs55ENJxgHnJbElc","text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","distance":0.30588285201674614}]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::zorp","input":{"query":"[canon:char] Zorp — identity and relationship to Pickles in Pirate World","namespace":"session7-baseline-pickles::char::zorp","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::events","input":{"query":"Pirate World is a separate alternate reality from Space World; Pickles has never met Zorp and breathes fire instead of ice","namespace":"session7-baseline-pickles::events","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::pirate-world","input":{"query":"[canon:place] Pirate World — separate alternate reality and its current facts","namespace":"session7-baseline-pickles::place::pirate-world","limit":10},"result":[]}
+  ],
+  "step6SpaceQuestion": [
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::pickles","input":{"query":"[canon:char] Pickles — current identity, relationships, location, and breath ability in Space World","namespace":"session7-baseline-pickles::char::pickles","limit":10},"result":[{"blob_id":"M8qypDBBfpkxMxRTgtQGEXdDOviQs55ENJxgHnJbElc","text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","distance":0.23986348830745552}]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::char::zorp","input":{"query":"[canon:char] Zorp — identity and relationship to Pickles in Space World","namespace":"session7-baseline-pickles::char::zorp","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::relationships","input":{"query":"[canon:relationship] Pickles and Zorp — relationship in Space World","namespace":"session7-baseline-pickles::relationships","limit":10},"result":[]},
+    {"operation":"recall","namespace":"session7-baseline-pickles::place::space-world","input":{"query":"[canon:place] Space World — alternate-reality facts involving Pickles and Zorp","namespace":"session7-baseline-pickles::place::space-world","limit":10},"result":[]}
+  ],
+  "experimentStoppedAfter": "step6SpaceQuestion"
+}
