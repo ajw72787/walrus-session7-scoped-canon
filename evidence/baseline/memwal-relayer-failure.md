@@ -95,3 +95,47 @@ This currently prevents completion of the fresh-conversation persistence test.
 The two independent reproductions used different relayer-side gas-selection addresses. This evidence does not establish a root cause beyond the reported gas-selection failures.
 
 Both failures returned `NO_SIDE_EFFECT`, so these failed attempts are not being counted as successful baseline memories.
+
+## Follow-up: Validation 5 durable memory confirmed
+
+After the previously observed Validation 5 `503` / `NO_SIDE_EFFECT` error, a later recall showed that a durable canonical memory existed in:
+
+`session7-harness-validation-5::place::test-harbor`
+
+Blob ID:
+`05BQe7jRh0SncwyWu36rRfxJUVkLWCQG4szSpFlaeOg`
+
+Stored text:
+`[canon:place] Test Harbor — The lighthouse is painted orange. (as of: current canon)`
+
+Initial observed recall distance:
+`0.02710045448329057`
+
+### Fresh-conversation validation
+
+After resetting local conversation history while preserving the same story namespace, the application queried:
+
+`[canon:place] Test Harbor — lighthouse color`
+
+MemWal recalled the same blob:
+
+`05BQe7jRh0SncwyWu36rRfxJUVkLWCQG4szSpFlaeOg`
+
+with text:
+
+`[canon:place] Test Harbor — The lighthouse is painted orange. (as of: current canon)`
+
+Recall distance:
+`0.10888421387005931`
+
+### Conclusion
+
+- The original Continuity Keeper baseline harness successfully demonstrated durable memory persistence and fresh-conversation recall.
+- The canonical memory was stored in the intended original-prompt child namespace rather than relying on browser conversation history.
+- The earlier `503` / `NO_SIDE_EFFECT` observations should remain documented because they occurred and were reproducible.
+- However, they should no longer be described as an active blocker to the Session 7 experiment.
+- The evidence currently does not establish exactly which submitted attempt produced the successful durable blob.
+- There is no direct evidence linking the earlier failed job ID to this blob, so this evidence does not claim that the earlier failed job later succeeded.
+- Server-side debug job tracking is process-local, so after application restart the UI no longer retained the original submitted-job metadata even though the durable MemWal memory remained available.
+
+Phase 3 harness validation: PASS
