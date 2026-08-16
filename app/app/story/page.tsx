@@ -18,6 +18,7 @@ export default function Story() {
   const [message, setMessage] = useState("");
   const [namespace, setNamespace] = useState(defaultNamespace);
   const [conversationId, setConversationId] = useState("");
+  const [clientStateLoaded, setClientStateLoaded] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,16 +31,18 @@ export default function Story() {
         sessionStorage.getItem(CONVERSATION_STORAGE_KEY) ??
           createConversationId(),
       );
+      setClientStateLoaded(true);
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
   useEffect(() => {
-    if (conversationId)
+    if (clientStateLoaded && conversationId)
       sessionStorage.setItem(CONVERSATION_STORAGE_KEY, conversationId);
-  }, [conversationId]);
+  }, [clientStateLoaded, conversationId]);
   useEffect(() => {
-    sessionStorage.setItem(NAMESPACE_STORAGE_KEY, namespace);
-  }, [namespace]);
+    if (clientStateLoaded)
+      sessionStorage.setItem(NAMESPACE_STORAGE_KEY, namespace);
+  }, [clientStateLoaded, namespace]);
 
   async function send(event: FormEvent) {
     event.preventDefault();
@@ -61,8 +64,8 @@ export default function Story() {
       const data = (await result.json()) as {
         error?: string;
         response?: string;
-        memories?: DebugSnapshot["recalledMemories"];
-        recallWarning?: string | null;
+        operations?: DebugSnapshot["operations"];
+        jobs?: DebugSnapshot["jobs"];
       };
       if (!result.ok || !data.response)
         throw new Error(data.error ?? "Chat failed.");
@@ -76,11 +79,10 @@ export default function Story() {
         JSON.stringify({
           namespace,
           conversationId,
-          recalledMemories: data.memories ?? [],
-          mostRecentWriteBlobId: null,
+          operations: data.operations ?? [],
+          jobs: data.jobs ?? [],
         } satisfies DebugSnapshot),
       );
-      if (data.recallWarning) setError(`Recall warning: ${data.recallWarning}`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Chat failed.");
     } finally {
