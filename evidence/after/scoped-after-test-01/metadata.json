@@ -1,0 +1,37 @@
+{
+  "date": "2026-08-17",
+  "dateTime": "2026-08-17T09:42:44-04:00",
+  "timeZone": "America/New_York",
+  "promptMode": "scoped",
+  "promptPath": "prompts/continuity-keeper-scoped.md",
+  "engineLabel": "Continuity Keeper — Scoped Canon",
+  "originalPromptSha256": "cff58abecfe2c2fa485a87fc46b3bb7e7529fd1f0c56781e3955a0d1e6007e88",
+  "scopedPromptSha256": "20c468d89a61bfff9899a1746a5c5e3d0d8c8685b9f675141fd0dd5a3b41fea8",
+  "openAIModel": "gpt-5.6-luna",
+  "memwalHealth": "ok",
+  "memwalRelayerVersion": "0.1.0",
+  "memwalApiVersion": "1.0.0",
+  "namespace": "session7-scoped-after-test-01",
+  "namespaceCleanAtPreflight": true,
+  "activeRealitiesUsed": ["space-world", "pirate-world"],
+  "primaryTestClassification": "PASS",
+  "supplementalTestClassifications": {
+    "freshSpaceRecall": "PASS",
+    "freshPirateRecall": "PASS",
+    "sameScopeContradictionGuard": "PASS"
+  },
+  "infrastructureErrors": [],
+  "rateLimitError": false,
+  "finalValidation": {
+    "promptsUnchanged": true,
+    "applicationCodeUnchanged": true,
+    "gitDiffCheck": "passed",
+    "secretsIncluded": false,
+    "committed": false,
+    "additionalWritesAfterTest": false
+  },
+  "workflowObservations": [
+    "Step 1's explicit remember request caused the CORE write before the finalization phrase; the required finalization phrase was still sent exactly once and produced recall only, with no duplicate write.",
+    "During Step 3 finalization, an initial remember tool call was rejected locally because exact-candidate dedup recall had not yet occurred. No MemWal job was created by that attempt. In the same single scene submission, the model performed the required exact recall and submitted one successful job."
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "preflight": {
+    "query": "session7 scoped after test Pickles Zorp Space World Pirate World",
+    "namespacesChecked": [
+      "session7-scoped-after-test-01::core::char::pickles",
+      "session7-scoped-after-test-01::core::char::zorp",
+      "session7-scoped-after-test-01::core::relationships",
+      "session7-scoped-after-test-01::reality::space-world::char::pickles",
+      "session7-scoped-after-test-01::reality::space-world::char::zorp",
+      "session7-scoped-after-test-01::reality::space-world::place::space-world",
+      "session7-scoped-after-test-01::reality::space-world::events",
+      "session7-scoped-after-test-01::reality::space-world::timeline",
+      "session7-scoped-after-test-01::reality::space-world::relationships",
+      "session7-scoped-after-test-01::reality::pirate-world::char::pickles",
+      "session7-scoped-after-test-01::reality::pirate-world::char::zorp",
+      "session7-scoped-after-test-01::reality::pirate-world::place::pirate-world",
+      "session7-scoped-after-test-01::reality::pirate-world::events",
+      "session7-scoped-after-test-01::reality::pirate-world::timeline",
+      "session7-scoped-after-test-01::reality::pirate-world::relationships"
+    ],
+    "results": [],
+    "errors": []
+  },
+  "corePickles": {
+    "candidate": "[canon:char] Pickles — a purple dragon (as of: character setup)",
+    "dedupNamespace": "session7-scoped-after-test-01::core::char::pickles",
+    "dedupRecall": {
+      "query": "[canon:char] Pickles — a purple dragon (as of: character setup)",
+      "namespace": "session7-scoped-after-test-01::core::char::pickles",
+      "results": []
+    },
+    "jobId": "e594b23a-1cbf-445d-9885-e2a7a221c998",
+    "jobState": "completed",
+    "finalBlobId": "T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ",
+    "finalizationRecall": {
+      "query": "[canon:char] Pickles — a purple dragon (character setup)",
+      "namespace": "session7-scoped-after-test-01::core::char::pickles",
+      "results": [{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.016797528761248626}]
+    },
+    "errors": []
+  },
+  "spaceScene": {
+    "activeReality": "space-world",
+    "preFinalizationRecalls": [
+      {"query":"Pickles purple dragon universal character canon","namespace":"session7-scoped-after-test-01::core::char::pickles","results":[{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.22948239122188407}]},
+      {"query":"Pickles character in Space World","namespace":"session7-scoped-after-test-01::reality::space-world::char::pickles","results":[]},
+      {"query":"Zorp character green alien in Space World","namespace":"session7-scoped-after-test-01::reality::space-world::char::zorp","results":[]},
+      {"query":"Pickles and Zorp friendship best friends in Space World","namespace":"session7-scoped-after-test-01::reality::space-world::relationships","results":[]}
+    ],
+    "finalizationRecalls": [
+      {"query":"Pickles character canon purple dragon","namespace":"session7-scoped-after-test-01::core::char::pickles","results":[{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.17176247147006551}]},
+      {"query":"Pickles character canon in Space World","namespace":"session7-scoped-after-test-01::reality::space-world::char::pickles","results":[]},
+      {"query":"Zorp character canon green alien","namespace":"session7-scoped-after-test-01::core::char::zorp","results":[]},
+      {"query":"Zorp character canon in Space World","namespace":"session7-scoped-after-test-01::reality::space-world::char::zorp","results":[]},
+      {"query":"Space World place canon","namespace":"session7-scoped-after-test-01::core::place::space-world","results":[]},
+      {"query":"Space World place reality canon","namespace":"session7-scoped-after-test-01::reality::space-world::place::space-world","results":[]},
+      {"query":"Pickles and Zorp best friends relationship in Space World","namespace":"session7-scoped-after-test-01::reality::space-world::relationships","results":[]}
+    ],
+    "writes": [
+      {"candidate":"[canon:char] Zorp — a green alien (as of: finalized scene)","dedupNamespace":"session7-scoped-after-test-01::reality::space-world::char::zorp","dedupRecall":{"query":"[canon:char] Zorp — a green alien (as of: finalized scene)","namespace":"session7-scoped-after-test-01::reality::space-world::char::zorp","results":[]},"jobId":"292f101a-c6c8-4532-a3c5-6f4ddd2da74b","jobState":"completed","finalBlobId":"PCPfAOavQ0l8dchZo1b7IW0arvWXJ1WpNaqS7oVvcYU","errors":[]},
+      {"candidate":"[canon:relationship] Pickles and Zorp — best friends in Space World (as of: finalized scene)","dedupNamespace":"session7-scoped-after-test-01::reality::space-world::relationships","dedupRecall":{"query":"[canon:relationship] Pickles and Zorp — best friends in Space World (as of: finalized scene)","namespace":"session7-scoped-after-test-01::reality::space-world::relationships","results":[]},"jobId":"a998c650-8eee-4201-ab00-c5c0246b45de","jobState":"completed","finalBlobId":"21KvUwvJ_I6DNKkMRPDkiRuyCFT5H2tzmxfu_p7qhjU","errors":[]}
+    ]
+  },
+  "pirateScene": {
+    "activeReality": "pirate-world",
+    "preFinalizationRecalls": [
+      {"query":"[canon:char] Pickles — current identity, appearance, and state","namespace":"session7-scoped-after-test-01::core::char::pickles","results":[{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.21646210286540124}]},
+      {"query":"[canon:char] Pickles — current identity, appearance, and state in Pirate World","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::pickles","results":[]},
+      {"query":"[canon:char] Zorp — identity, appearance, and state in Pirate World","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::zorp","results":[]},
+      {"query":"[canon:relationship] Pickles and Zorp — relationship in Pirate World","namespace":"session7-scoped-after-test-01::reality::pirate-world::relationships","results":[]},
+      {"query":"[canon:char] Zorp — universal identity, appearance, and state","namespace":"session7-scoped-after-test-01::core::char::zorp","results":[]}
+    ],
+    "finalizationRecalls": [
+      {"query":"[canon:char] Pickles — purple dragon","namespace":"session7-scoped-after-test-01::core::char::pickles","results":[{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.03666354411318795}]},
+      {"query":"[canon:char] Zorp — green alien","namespace":"session7-scoped-after-test-01::core::char::zorp","results":[]},
+      {"query":"[canon:char] Pickles — Pirate World state and identity","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::pickles","results":[]},
+      {"query":"[canon:char] Zorp — Pirate World state and identity","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::zorp","results":[]},
+      {"query":"[canon:relationship] Pickles and Zorp — relationship in Pirate World","namespace":"session7-scoped-after-test-01::reality::pirate-world::relationships","results":[]}
+    ],
+    "candidate": "[canon:relationship] Pickles and Zorp — have never met in Pirate World (as of: finalized scene)",
+    "dedupNamespace": "session7-scoped-after-test-01::reality::pirate-world::relationships",
+    "dedupRecall": {
+      "query": "[canon:relationship] Pickles and Zorp — have never met in Pirate World (as of: finalized scene)",
+      "namespace": "session7-scoped-after-test-01::reality::pirate-world::relationships",
+      "results": []
+    },
+    "spaceFriendshipBlobAppearedDuringDedup": false,
+    "accepted": true,
+    "jobId": "1343ebc0-886f-42dd-aeeb-664230eac935",
+    "jobState": "completed",
+    "finalBlobId": "ySgchdaO9JK_uBncOO3RaEMPGJM7m9PTtKyKyA-C9ZM",
+    "errors": ["Initial local remember attempt rejected before submission: Recall this exact candidate in its exact target namespace before writing."]
+  },
+  "freshSpaceRecall": {
+    "answer": "In Space World, Pickles and Zorp are best friends.",
+    "recalls": [
+      {"query":"Pickles relationship with Zorp","namespace":"session7-scoped-after-test-01::core::char::pickles","results":[{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.5227777224579282}]},
+      {"query":"Zorp relationship with Pickles","namespace":"session7-scoped-after-test-01::core::char::zorp","results":[]},
+      {"query":"Pickles and Zorp relationship","namespace":"session7-scoped-after-test-01::reality::space-world::relationships","results":[{"blobId":"21KvUwvJ_I6DNKkMRPDkiRuyCFT5H2tzmxfu_p7qhjU","text":"[canon:relationship] Pickles and Zorp — best friends in Space World (as of: finalized scene)","distance":0.23008503323066465}]},
+      {"query":"Pickles relationship with Zorp","namespace":"session7-scoped-after-test-01::reality::space-world::char::pickles","results":[]},
+      {"query":"Zorp relationship with Pickles","namespace":"session7-scoped-after-test-01::reality::space-world::char::zorp","results":[{"blobId":"PCPfAOavQ0l8dchZo1b7IW0arvWXJ1WpNaqS7oVvcYU","text":"[canon:char] Zorp — a green alien (as of: finalized scene)","distance":0.48726495966029115}]}
+    ],
+    "pirateRelationshipBlobAppeared": false,
+    "errors": []
+  },
+  "freshPirateRecall": {
+    "answer": "In Pirate World, Pickles and Zorp have never met.",
+    "recalls": [
+      {"query":"Pickles","namespace":"session7-scoped-after-test-01::core::char::pickles","results":[{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.48959222012821846}]},
+      {"query":"Zorp","namespace":"session7-scoped-after-test-01::core::char::zorp","results":[]},
+      {"query":"Pickles Zorp relationship","namespace":"session7-scoped-after-test-01::reality::pirate-world::relationships","results":[{"blobId":"ySgchdaO9JK_uBncOO3RaEMPGJM7m9PTtKyKyA-C9ZM","text":"[canon:relationship] Pickles and Zorp — have never met in Pirate World (as of: finalized scene)","distance":0.26286529918824864}]},
+      {"query":"Pickles","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::pickles","results":[]},
+      {"query":"Zorp","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::zorp","results":[]}
+    ],
+    "spaceRelationshipBlobAppeared": false,
+    "errors": []
+  },
+  "sameScopeContradictionGuard": {
+    "answer": "⚠️ **Continuity conflict.** Pirate World canon says: «Pickles and Zorp have never met.» This scene says they have always been best friends. Retcon the Pirate World canon, or revise the scene?",
+    "recalls": [
+      {"query":"Pickles identity, current state, and shared canon","namespace":"session7-scoped-after-test-01::core::char::pickles","results":[{"blobId":"T2HOECudmTSq4GofYFj4FM0zxynPrbl8Li1NuDy2vBQ","text":"[canon:char] Pickles — a purple dragon (as of: character setup)","distance":0.4022162772379053}]},
+      {"query":"Zorp identity, current state, and shared canon","namespace":"session7-scoped-after-test-01::core::char::zorp","results":[]},
+      {"query":"Pickles identity, current state, and relationships in Pirate World","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::pickles","results":[]},
+      {"query":"Zorp identity, current state, and relationships in Pirate World","namespace":"session7-scoped-after-test-01::reality::pirate-world::char::zorp","results":[]},
+      {"query":"Pickles and Zorp relationship in Pirate World","namespace":"session7-scoped-after-test-01::reality::pirate-world::relationships","results":[{"blobId":"ySgchdaO9JK_uBncOO3RaEMPGJM7m9PTtKyKyA-C9ZM","text":"[canon:relationship] Pickles and Zorp — have never met in Pirate World (as of: finalized scene)","distance":0.1934497510729789}]}
+    ],
+    "jobs": [],
+    "errors": []
+  }
+}
