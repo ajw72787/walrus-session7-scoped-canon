@@ -1,0 +1,32 @@
+{
+  "dateTime": "2026-08-17T07:01:04-04:00",
+  "timeZone": "America/New_York",
+  "promptMode": "original",
+  "promptPath": "prompts/continuity-keeper-original.md",
+  "originalPromptSha256": "cff58abecfe2c2fa485a87fc46b3bb7e7529fd1f0c56781e3955a0d1e6007e88",
+  "promptUnchanged": true,
+  "namespace": "session7-original-baseline-v2",
+  "preflight": {
+    "memwalHealth": {
+      "status": "ok",
+      "version": "0.1.0",
+      "relayerVersion": "0.1.0",
+      "apiVersion": "1.0.0",
+      "buildCommit": "2162d261987ebeec9792e880eea0e038335c846f"
+    },
+    "promptMode": "original",
+    "namespaceClean": true
+  },
+  "baselineStatus": "failed",
+  "stoppedAfter": "step1-finalization",
+  "stopReason": "Step 1 finalization remember_bulk returned HTTP 429 at the delegate_key rate-limit layer.",
+  "completedBlobCount": 5,
+  "stepsRun": ["step1-pickles", "step1-finalization"],
+  "stepsNotRun": [
+    "step2-space-world",
+    "step3-pirate-world",
+    "step4-fresh-pirate",
+    "step5-fresh-space"
+  ],
+  "secretsIncluded": false
+}

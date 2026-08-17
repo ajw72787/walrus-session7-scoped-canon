@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-17",
+  "timeZone": "America/New_York",
+  "promptMode": "original",
+  "promptPath": "prompts/continuity-keeper-original.md",
+  "originalPromptSha256": "cff58abecfe2c2fa485a87fc46b3bb7e7529fd1f0c56781e3955a0d1e6007e88",
+  "promptUnchanged": true,
+  "namespace": "session7-original-baseline-v3",
+  "preflight": {
+    "health": "ok",
+    "relayerVersion": "0.1.0",
+    "apiVersion": "1.0.0",
+    "buildCommit": "2162d261987ebeec9792e880eea0e038335c846f",
+    "namespaceClean": true
+  },
+  "baselineStatus": "failed",
+  "stoppedAfter": "step3-pirate-finalization-job-timeout",
+  "rateLimitError": false,
+  "completedBlobs": {
+    "pickles": 6,
+    "spaceWorld": 4,
+    "pirateWorld": 0
+  },
+  "stepsNotRun": ["step4-fresh-pirate", "step5-fresh-space"],
+  "secretsIncluded": false
+}

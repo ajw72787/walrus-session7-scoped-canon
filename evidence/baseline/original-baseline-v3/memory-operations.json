@@ -1,0 +1,58 @@
+{
+  "namespaceCleanlinessPreflight": [
+    {"namespace":"session7-original-baseline-v3::char::pickles","result":[]},
+    {"namespace":"session7-original-baseline-v3::char::zorp","result":[]},
+    {"namespace":"session7-original-baseline-v3::place::space-world","result":[]},
+    {"namespace":"session7-original-baseline-v3::place::mars","result":[]},
+    {"namespace":"session7-original-baseline-v3::place::pirate-world","result":[]},
+    {"namespace":"session7-original-baseline-v3::relationships","result":[]},
+    {"namespace":"session7-original-baseline-v3::events","result":[]},
+    {"namespace":"session7-original-baseline-v3::timeline","result":[]},
+    {"namespace":"session7-original-baseline-v3::rule::alternate-realities","result":[]}
+  ],
+  "pickles": {
+    "namespace": "session7-original-baseline-v3::char::pickles",
+    "jobs": [
+      {"jobId":"ee0ca3c1-a934-4993-85af-09b70291e060","state":"completed","blobId":"6iEuNwGWpzkQT5-0PtYJ2XxcNwxNpNcoN_AtOCbRESc","text":"[canon:char] Pickles — a small purple dragon (as of: story setup)"},
+      {"jobId":"55b1a706-96fa-462f-8777-e8cad922a440","state":"completed","blobId":"YU0krEupYBdTdEbVroeD5kAuVOWS2lhqe9pmLjgppNc","text":"[canon:char] Pickles — curious and playful (as of: story setup)"},
+      {"jobId":"d9b6618b-913f-4fdc-abc9-5b089b6759b1","state":"completed","blobId":"gb4kjepWsglUVkyitDp_6mQS4bjmn8JTGHIpadWB7OI","text":"[canon:char] Pickles — breathes ice instead of fire (as of: story setup)"},
+      {"jobId":"af3230e1-531a-45a9-8f09-d48e2d4c0160","state":"completed","blobId":"ReXOSCqTGnFJy43b5geZDnxL6TqU-u3PmWFKYEbNsw0","text":"[canon:char] Pickles — loves pizza (as of: story setup)"},
+      {"jobId":"50405834-87f5-4213-9295-c8c9bdeee9dc","state":"completed","blobId":"XfPWuycyRs5WxSJT4DhKVmwjurkmq8vP-73_teJHudk","text":"[canon:char] Pickles — afraid of chickens (as of: story setup)"},
+      {"jobId":"bf732e4f-9ff3-4d84-b474-c337f4769638","state":"completed","blobId":"eo4afFcYACpHXBDZFCrBRovj9uzbBYrjgueOuK1OeKU","text":"[canon:char] Pickles — afraid of chickens (as of: character setup)"}
+    ]
+  },
+  "spaceWorld": {
+    "rejectedNamespaceAttempts": [
+      "space-world::char::pickles",
+      "space-world::char::zorp",
+      "space-world::relationships",
+      "space-world::term::space-world"
+    ],
+    "jobs": [
+      {"namespace":"session7-original-baseline-v3::char::space-world-pickles","jobId":"393bb017-acfc-4144-a6c6-a890c85915f3","state":"completed","blobId":"tv-Qj2r1OH3L1lApqIDrhdEyQgz6fNmFnzq82y5atMM","text":"[canon:char] Space World Pickles — lives on Mars and breathes ice (as of: Space World setup)"},
+      {"namespace":"session7-original-baseline-v3::char::zorp","jobId":"0288c834-43f1-459f-8b4c-015a5a28c28e","state":"completed","blobId":"tmj64cC8-meF9vF6iZ0LSqrhtUt2ks8clElr-7cLXl4","text":"[canon:char] Zorp — friendly green alien in Space World (as of: Space World setup)"},
+      {"namespace":"session7-original-baseline-v3::relationships","jobId":"10d8e900-9687-4fb4-bb57-0934bb9f7419","state":"completed","blobId":"ca459AJLuwU6eIwR8mJq660KeEgAcS141SoldFbrVv4","text":"[canon:relationship] Space World Pickles and Zorp — best friends (as of: Space World setup)"},
+      {"namespace":"session7-original-baseline-v3::term::space-world","jobId":"6df35deb-db82-458f-82da-91b7faabd048","state":"completed","blobId":"6l1aZk8C2opr0pKIuyheRi74WUiJS2PWMmCrNvSL66Q","text":"[canon:term] Space World — an alternate reality in which Pickles lives on Mars (as of: Space World setup)"}
+    ]
+  },
+  "pirateWorld": {
+    "rejectedNamespaceAttempts": [
+      "pirate-world::char::pickles",
+      "pirate-world::relationships",
+      "pirate-world::term::pirate-world"
+    ],
+    "sharedRelationshipRecalls": [
+      {"query":"[canon:relationship] Pirate World Pickles and Zorp — have never met (as of: character setup)","namespace":"session7-original-baseline-v3::relationships","results":[{"blobId":"ca459AJLuwU6eIwR8mJq660KeEgAcS141SoldFbrVv4","text":"[canon:relationship] Space World Pickles and Zorp — best friends (as of: Space World setup)","distance":0.1985732052319169}]},
+      {"query":"[canon:relationship] Zorp and Pirate World Pickles — no meeting has ever occurred between them (as of: character setup)","namespace":"session7-original-baseline-v3::relationships","results":[{"blobId":"ca459AJLuwU6eIwR8mJq660KeEgAcS141SoldFbrVv4","text":"[canon:relationship] Space World Pickles and Zorp — best friends (as of: Space World setup)","distance":0.18301046492180073}]}
+    ],
+    "rejectedWrite": {"error":"Duplicate candidate skipped: nearest distance is below 0.25."},
+    "jobs": [
+      {"namespace":"session7-original-baseline-v3::char::pirate-world-pickles","jobId":"97362757-da10-477c-9997-e5b094ea3b3d","state":"running","blobId":null,"text":"[canon:char] Pirate World Pickles — pirate captain who breathes fire instead of ice and has never met Zorp (as of: character setup)","error":"Internal Error: durable Walrus upload failed (503 Service Unavailable): {\"error\":\"registration transaction was not successful\",\"code\":\"NO_SIDE_EFFECT\",\"traceId\":\"8a7c3cc3-c9bf-47eb-a302-d81ca5423278\"}"},
+      {"namespace":"session7-original-baseline-v3::term::pirate-world","jobId":"1325f3c3-89d7-4f92-9f29-c9ffb750bd89","state":"running","blobId":null,"text":"[canon:term] Pirate World — a separate alternate reality, not a continuation of Space World (as of: character setup)","error":"Internal Error: durable Walrus upload failed (503 Service Unavailable): {\"error\":\"registration transaction was not successful\",\"code\":\"NO_SIDE_EFFECT\",\"traceId\":\"345b2c13-c8eb-4a81-a729-b52b9ddbc7b9\"}"}
+    ],
+    "pollOutcome": "timeout after 180 seconds without terminal state"
+  },
+  "freshPirate": {"run":false,"reason":"Stopped after Pirate write failure/timeout."},
+  "freshSpace": {"run":false,"reason":"Stopped after Pirate write failure/timeout."},
+  "rateLimitError": false
+}

@@ -1,0 +1,51 @@
+{
+  "namespaceCleanlinessPreflight": [
+    {"namespace":"session7-original-baseline-v2::char::pickles","query":"Pickles","result":[]},
+    {"namespace":"session7-original-baseline-v2::char::zorp","query":"Zorp","result":[]},
+    {"namespace":"session7-original-baseline-v2::place::space-world","query":"Space World","result":[]},
+    {"namespace":"session7-original-baseline-v2::place::mars","query":"Mars","result":[]},
+    {"namespace":"session7-original-baseline-v2::place::pirate-world","query":"Pirate World","result":[]},
+    {"namespace":"session7-original-baseline-v2::relationships","query":"Pickles Zorp relationships","result":[]},
+    {"namespace":"session7-original-baseline-v2::events","query":"Space World Pirate World","result":[]},
+    {"namespace":"session7-original-baseline-v2::timeline","query":"Space World Pirate World","result":[]},
+    {"namespace":"session7-original-baseline-v2::rule::alternate-realities","query":"alternate realities","result":[]}
+  ],
+  "step1SlugResponse": {
+    "response": "✓ canon: Pickles — small purple dragon; curious and playful; breathes ice; loves pizza; fears chickens.",
+    "operations": [
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — a small purple dragon (as of: character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — curious and playful (as of: character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — loves pizza (as of: character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — afraid of chickens (as of: character setup)","limit":3},"result":[]},
+      {"operation":"remember_bulk","input":{"facts":[
+        {"text":"[canon:char] Pickles — a small purple dragon (as of: character setup)","namespace":"session7-original-baseline-v2::char::pickles"},
+        {"text":"[canon:char] Pickles — curious and playful (as of: character setup)","namespace":"session7-original-baseline-v2::char::pickles"},
+        {"text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)","namespace":"session7-original-baseline-v2::char::pickles"},
+        {"text":"[canon:char] Pickles — loves pizza (as of: character setup)","namespace":"session7-original-baseline-v2::char::pickles"},
+        {"text":"[canon:char] Pickles — afraid of chickens (as of: character setup)","namespace":"session7-original-baseline-v2::char::pickles"}
+      ]},"result":{"job_ids":["c1d700b4-d793-4e43-8e24-6dfa37f6e68b","06750fa3-5efd-4c7c-9e5c-f6f782612734","f6f23f40-2ef9-4339-b7a2-272b073b8ffc","fff8a0fb-c05e-4346-865b-00a6390d7856","454c9371-e618-4983-8c9e-47c32c2abc0b"],"total":5,"status":"running","state":"submitted"}}
+    ]
+  },
+  "step1Jobs": [
+    {"jobId":"c1d700b4-d793-4e43-8e24-6dfa37f6e68b","state":"completed","blobId":"BozWxKcIJt-IwpBY3tfbD5noN2JxG9fR0e72wHYBqaI","namespace":"session7-original-baseline-v2::char::pickles","text":"[canon:char] Pickles — a small purple dragon (as of: character setup)"},
+    {"jobId":"06750fa3-5efd-4c7c-9e5c-f6f782612734","state":"completed","blobId":"vC299nM9E5Uhvf21mUtqIb5UQAm2ZLtqbMdoz-SFCp8","namespace":"session7-original-baseline-v2::char::pickles","text":"[canon:char] Pickles — curious and playful (as of: character setup)"},
+    {"jobId":"f6f23f40-2ef9-4339-b7a2-272b073b8ffc","state":"completed","blobId":"T7HiVsEEVEQYCz5Vg_hTs1gyWrt8ajKwBpL1Ftf5AyI","namespace":"session7-original-baseline-v2::char::pickles","text":"[canon:char] Pickles — breathes ice instead of fire (as of: character setup)"},
+    {"jobId":"fff8a0fb-c05e-4346-865b-00a6390d7856","state":"completed","blobId":"TbX1dWNiwC_usQYYL4O3JsIFKFpMbr-QTgj4FUVVdDU","namespace":"session7-original-baseline-v2::char::pickles","text":"[canon:char] Pickles — loves pizza (as of: character setup)"},
+    {"jobId":"454c9371-e618-4983-8c9e-47c32c2abc0b","state":"completed","blobId":"DYMhcEhhGF0i893z-IDy5MDuKh93mzFy0UfrO_0fxMA","namespace":"session7-original-baseline-v2::char::pickles","text":"[canon:char] Pickles — afraid of chickens (as of: character setup)"}
+  ],
+  "step1Finalization": {
+    "response": "Canon candidates were deduplicated, but storage is temporarily rate-limited. Please retry in about a minute.",
+    "operations": [
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — a small purple dragon (as of: initial character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — curious and playful (as of: initial character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — breathes ice instead of fire (as of: initial character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — loves pizza (as of: initial character setup)","limit":3},"result":[]},
+      {"operation":"recall","namespace":"session7-original-baseline-v2::char::pickles","input":{"query":"[canon:char] Pickles — afraid of chickens (as of: initial character setup)","limit":3},"result":[]},
+      {"operation":"remember_bulk","error":"Walrus Memory server error (429): {\"error\":\"Rate limit exceeded\",\"layer\":\"delegate_key\",\"limit\":\"30 weighted-requests/min\",\"retry_after_seconds\":60}"}
+    ],
+    "jobs": []
+  },
+  "stopped": true,
+  "stopReason": "Step 1 finalization write failed; no retry and no later scenario steps were run."
+}
