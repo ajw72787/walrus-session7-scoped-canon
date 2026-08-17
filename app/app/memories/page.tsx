@@ -10,6 +10,7 @@ import {
   type Character,
   type World,
 } from "@/lib/client-state";
+import { getStoryRecallNamespaces } from "@/lib/namespaces";
 
 type Memory = { blobId: string; text: string; distance: number };
 type Group = { core: Memory[]; world: Memory[] };
@@ -65,19 +66,12 @@ function Memories() {
     setError(null);
     const story = storySlug(character);
     const characterSlug = slugify(character.name);
-    const core = [
-      `${story}::core::char::${characterSlug}`,
-      `${story}::core::relationships`,
-    ];
-    const reality = world
-      ? [
-          `${story}::reality::${world.id}::char::${characterSlug}`,
-          `${story}::reality::${world.id}::place::${world.id}`,
-          `${story}::reality::${world.id}::relationships`,
-          `${story}::reality::${world.id}::events`,
-          `${story}::reality::${world.id}::timeline`,
-        ]
-      : [];
+    const { core, reality } = getStoryRecallNamespaces(
+      story,
+      characterSlug,
+      world?.id ?? null,
+      world?.id ?? null,
+    );
     try {
       const recall = async (namespace: string) => {
         const response = await fetch("/api/memwal/recall", {

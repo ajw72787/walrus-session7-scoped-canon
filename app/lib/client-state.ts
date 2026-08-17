@@ -51,8 +51,14 @@ export type MemoryJob = {
 export type DebugSnapshot = {
   namespace: string;
   characterName?: string;
+  characterSlug?: string;
   activeReality: string | null;
+  activeRealityName?: string;
   conversationId: string;
+  requestAction?: "continue" | "finalize";
+  writeToolsEnabled?: boolean;
+  preloadedCanon?: PreloadedCanonMemory[];
+  preloadErrors?: Array<{ namespace: string; error: string }>;
   operations: Array<{
     operation: "recall" | "remember" | "remember_bulk" | "analyze";
     namespace: string;
@@ -61,6 +67,13 @@ export type DebugSnapshot = {
     error?: string;
   }>;
   jobs: MemoryJob[];
+};
+
+export type PreloadedCanonMemory = {
+  namespace: string;
+  text: string;
+  blobId: string;
+  distance: number;
 };
 
 export function slugify(value: string): string {
@@ -121,4 +134,18 @@ export function createConversationId() {
   if (typeof browserCrypto?.randomUUID === "function")
     return browserCrypto.randomUUID();
   return `conversation-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+export function storyConversationStorageKey(
+  characterId: string,
+  realitySlug: string,
+): string {
+  return `${CONVERSATION_STORAGE_KEY}:${characterId}:${realitySlug}`;
+}
+
+export function storyHistoryStorageKey(
+  characterId: string,
+  realitySlug: string,
+): string {
+  return `${STORY_HISTORY_STORAGE_KEY}:${characterId}:${realitySlug}`;
 }

@@ -26,6 +26,30 @@ export function getCanonScopeRoot(
   return scoped ? `${selectedStory}::${scoped[1]}` : selectedStory;
 }
 
+export function getStoryRecallNamespaces(
+  story: string,
+  characterSlug: string,
+  realitySlug: string | null,
+  worldSlug: string | null,
+): { core: string[]; reality: string[] } {
+  const core = [
+    `${story}::core::char::${characterSlug}`,
+    `${story}::core::relationships`,
+  ];
+  if (!realitySlug || !worldSlug) return { core, reality: [] };
+  const root = `${story}::reality::${realitySlug}`;
+  return {
+    core,
+    reality: [
+      `${root}::char::${characterSlug}`,
+      `${root}::place::${worldSlug}`,
+      `${root}::relationships`,
+      `${root}::events`,
+      `${root}::timeline`,
+    ],
+  };
+}
+
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

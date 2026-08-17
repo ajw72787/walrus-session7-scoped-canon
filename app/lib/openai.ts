@@ -1,9 +1,27 @@
 import "server-only";
-import type { ChatMessage, MemoryJob } from "@/lib/client-state";
+import {
+  slugify,
+  type ChatMessage,
+  type MemoryJob,
+  type PreloadedCanonMemory,
+} from "@/lib/client-state";
 import { trackMemoryJob } from "@/lib/memory-jobs";
-import { analyze, recall, remember, rememberBulk } from "@/lib/memwal";
-import { getCanonScopeRoot, isCanonNamespace } from "@/lib/namespaces";
+import { recall, remember, rememberBulk } from "@/lib/memwal";
+import {
+  getCanonScopeRoot,
+  getStoryRecallNamespaces,
+  isCanonNamespace,
+} from "@/lib/namespaces";
 import type { PromptMode } from "@/lib/prompt";
+import {
+  CHILD_STORYTELLER_INSTRUCTIONS,
+  actionInstructions,
+  formatCharacterContext,
+  formatWorldContext,
+  type StoryAction,
+  type StoryCharacterContext,
+  type StoryWorldContext,
+} from "@/lib/storyteller";
 type Item = {
   type?: string;
   name?: string;
@@ -23,24 +41,24 @@ const ns = {
   description:
     "An exact valid Continuity Keeper child namespace for the selected story. The bare story root is invalid.",
 };
-const tools = [
-  {
-    type: "function",
-    name: "memwal_recall",
-    description:
-      "Recall canon before writing or recall a candidate for deduplication.",
-    strict: true,
-    parameters: {
-      type: "object",
-      properties: {
-        query: { type: "string" },
-        namespace: ns,
-        limit: { type: "integer", minimum: 1, maximum: 10 },
-      },
-      required: ["query", "namespace", "limit"],
-      additionalProperties: false,
+const recallTool = {
+  type: "function",
+  name: "memwal_recall",
+  description:
+    "Recall canon before writing or recall a candidate for deduplication.",
+  strict: true,
+  parameters: {
+    type: "object",
+    properties: {
+      query: { type: "string" },
+      namespace: ns,
+      limit: { type: "integer", minimum: 1, maximum: 10 },
     },
+    required: ["query", "namespace", "limit"],
+    additionalProperties: false,
   },
+};
+const writeTools = [
   {
     type: "function",
     name: "memwal_remember",
@@ -79,24 +97,11 @@ const tools = [
       additionalProperties: false,
     },
   },
-  {
-    type: "function",
-    name: "memwal_analyze",
-    description:
-      "Debug-only SDK capability. It persists extracted facts immediately; call only when the user explicitly requests memwal_analyze itself, never for the baseline finalized-scene workflow.",
-    strict: true,
-    parameters: {
-      type: "object",
-      properties: { text: { type: "string" }, namespace: ns },
-      required: ["text", "namespace"],
-      additionalProperties: false,
-    },
-  },
 ];
 
 const installedSdkCompatibility = `
 Installed SDK compatibility rules (follow these in place of invoking memwal_analyze):
-- memwal_analyze is debug-only because this SDK persists its extracted facts immediately. Never call it unless the user explicitly asks to invoke memwal_analyze itself.
+- memwal_analyze is unavailable in this route because this SDK persists its extracted facts immediately. Never call it.
 - When the author finalizes prose, you must extract candidate durable facts yourself, using the prompt's exact note schema.
 - Derive each candidate's exact child namespace from its canon type and entity, recall the full candidate text in that exact namespace, and evaluate the returned distances before writing.
 - A write is rejected unless that exact candidate recall happened first. Never use the bare story root.
@@ -116,6 +121,9 @@ export async function generateResponse(
   storyNamespace: string,
   promptMode: PromptMode,
   activeReality: string | null,
+  action: StoryAction,
+  character: StoryCharacterContext,
+  world: StoryWorldContext | null,
 ) {
   if (!process.env.OPENAI_API_KEY)
     throw new Error(
@@ -124,7 +132,18 @@ export async function generateResponse(
   let input: unknown[] = [...history, { role: "user", content: userMessage }];
   const operations: MemoryToolOperation[] = [];
   const jobs: MemoryJob[] = [];
-  const allowAnalyze = /\bmemwal_analyze\b/i.test(userMessage);
+  const preload =
+    action === "continue" && promptMode === "scoped" && activeReality && world
+      ? await preloadCanon(
+          storyNamespace,
+          activeReality,
+          character,
+          world,
+          operations,
+        )
+      : { memories: [], errors: [] };
+  const availableTools =
+    action === "finalize" ? [recallTool, ...writeTools] : [recallTool];
   for (let turn = 0; turn < 12; turn += 1) {
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -134,12 +153,17 @@ export async function generateResponse(
       },
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL ?? "gpt-5-mini",
-        instructions:
-          systemPrompt +
-          installedSdkCompatibility +
-          `\nRuntime conversation context:\n- Selected story slug: ${storyNamespace}\n- Prompt mode: ${promptMode}\n- Active reality: ${activeReality ?? "none"}\n`,
+        instructions: [
+          "CANON OPERATIONAL PROMPT\n" + systemPrompt,
+          "APPLICATION COMPATIBILITY RULES\n" + installedSdkCompatibility,
+          "CHILD STORYTELLER INSTRUCTIONS\n" + CHILD_STORYTELLER_INSTRUCTIONS,
+          formatCharacterContext(character),
+          formatWorldContext(world),
+          formatCanonContext(preload.memories),
+          `REQUEST CONTEXT\n- Action: ${action}\n- Selected story slug: ${storyNamespace}\n- Prompt mode: ${promptMode}\n- Active reality: ${activeReality ?? "none"}\n- Durable write tools enabled: ${action === "finalize" ? "YES" : "NO"}\n${actionInstructions(action)}`,
+        ].join("\n\n---\n\n"),
         input,
-        tools,
+        tools: availableTools,
         tool_choice: "auto",
       }),
     });
@@ -167,7 +191,7 @@ export async function generateResponse(
             storyNamespace,
             operations,
             jobs,
-            allowAnalyze,
+            action,
           ),
         })),
       );
@@ -182,7 +206,14 @@ export async function generateResponse(
         .map((x) => x.text ?? "")
         .join("\n");
     if (!text) throw new Error("OpenAI returned no text response.");
-    return { text, operations, jobs };
+    return {
+      text,
+      operations,
+      jobs,
+      preloadedCanon: preload.memories,
+      preloadErrors: preload.errors,
+      writeToolsEnabled: action === "finalize",
+    };
   }
   throw new Error("OpenAI exceeded the memory tool-call limit.");
 }
@@ -203,7 +234,7 @@ async function run(
   selected: string,
   operations: MemoryToolOperation[],
   jobs: MemoryJob[],
-  allowAnalyze: boolean,
+  action: StoryAction,
 ) {
   let args: Record<string, unknown>;
   try {
@@ -229,6 +260,10 @@ async function run(
         Number(args.limit),
       );
     } else if (name === "memwal_remember") {
+      if (action !== "finalize")
+        throw new Error(
+          "Durable memory writes are disabled for continue actions.",
+        );
       guard(selected, args.namespace);
       const candidate = String(args.text);
       const dedupRecall = requireDedup(operations, args.namespace, candidate);
@@ -245,6 +280,10 @@ async function run(
         accepted.job_id,
       );
     } else if (name === "memwal_remember_bulk") {
+      if (action !== "finalize")
+        throw new Error(
+          "Durable memory writes are disabled for continue actions.",
+        );
       const facts = args.facts as Array<{ text: string; namespace: string }>;
       const recalls = facts.map((fact) => {
         guard(selected, fact.namespace);
@@ -264,14 +303,7 @@ async function run(
           jobId,
         ),
       );
-    } else if (name === "memwal_analyze") {
-      if (!allowAnalyze)
-        throw new Error(
-          "memwal_analyze is debug-only and was not explicitly requested.",
-        );
-      guard(selected, args.namespace);
-      result = await analyze(args.namespace, String(args.text));
-    } else throw new Error("Unknown tool: " + name);
+    } else throw new Error("Unknown or unavailable tool: " + name);
     operation.result = result;
     return JSON.stringify(result);
   } catch (error) {
@@ -279,6 +311,75 @@ async function run(
       error instanceof Error ? error.message : "Memory tool failed.";
     return JSON.stringify({ error: operation.error });
   }
+}
+
+async function preloadCanon(
+  story: string,
+  activeReality: string,
+  character: StoryCharacterContext,
+  world: StoryWorldContext,
+  operations: MemoryToolOperation[],
+): Promise<{
+  memories: PreloadedCanonMemory[];
+  errors: Array<{ namespace: string; error: string }>;
+}> {
+  const characterSlug = slugify(character.name);
+  const scoped = getStoryRecallNamespaces(
+    story,
+    characterSlug,
+    activeReality,
+    world.id,
+  );
+  const namespaces = [...scoped.core, ...scoped.reality];
+  const query = `${character.name} in ${world.name}: identity, relationships, setting, and recent lasting story canon`;
+  const errors: Array<{ namespace: string; error: string }> = [];
+  const groups = await Promise.all(
+    namespaces.map(async (namespace) => {
+      const operation: MemoryToolOperation = {
+        operation: "recall",
+        namespace,
+        input: { query, limit: 10, source: "deterministic-preload" },
+      };
+      operations.push(operation);
+      try {
+        const results = await recall(namespace, query, 10);
+        operation.result = results;
+        return results.map((memory) => ({
+          namespace,
+          text: memory.text,
+          blobId: memory.blob_id,
+          distance: memory.distance,
+        }));
+      } catch (cause) {
+        const error =
+          cause instanceof Error ? cause.message : "Canon preload failed.";
+        operation.error = error;
+        errors.push({ namespace, error });
+        return [];
+      }
+    }),
+  );
+  const memories = groups
+    .flat()
+    .filter(
+      (memory, index, all) =>
+        all.findIndex(
+          (candidate) =>
+            candidate.namespace === memory.namespace &&
+            candidate.blobId === memory.blobId,
+        ) === index,
+    );
+  return { memories, errors };
+}
+
+function formatCanonContext(memories: PreloadedCanonMemory[]): string {
+  if (!memories.length)
+    return "PRELOADED APPLICABLE CANON\nNo canon was returned. Do not invent recalled facts.";
+  return [
+    "PRELOADED APPLICABLE CANON",
+    "Treat these retrieved notes as authoritative context. Do not reveal their technical metadata to the child.",
+    ...memories.map((memory) => `- ${memory.text}`),
+  ].join("\n");
 }
 
 function requireDedup(

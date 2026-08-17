@@ -130,12 +130,28 @@ export default function Debug() {
             />
             <Row label="Namespace" value={namespace} />
             <Row
-              label="Character"
-              value={snapshot?.characterName ?? "No character selected"}
+              label="Selected character"
+              value={
+                snapshot?.characterName
+                  ? `${snapshot.characterName} / ${snapshot.characterSlug ?? "unknown slug"}`
+                  : "No character selected"
+              }
             />
             <Row
               label="Active reality"
-              value={snapshot?.activeReality ?? storedReality}
+              value={
+                snapshot?.activeReality
+                  ? `${snapshot.activeRealityName ?? "Unknown name"} / ${snapshot.activeReality}`
+                  : storedReality
+              }
+            />
+            <Row
+              label="Request action"
+              value={snapshot?.requestAction ?? "No request yet"}
+            />
+            <Row
+              label="Write tools enabled"
+              value={snapshot?.writeToolsEnabled ? "YES" : "NO"}
             />
             <Row label="Conversation ID" value={conversationId} />
           </dl>
@@ -208,6 +224,37 @@ export default function Debug() {
           </div>
         </Card>
       )}
+      <Card>
+        <h2 className="mb-4 font-semibold">Preloaded canon</h2>
+        {!snapshot?.preloadedCanon?.length ? (
+          <p className="text-sm text-[var(--muted)]">
+            No canon was preloaded for the latest request.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {snapshot.preloadedCanon.map((memory, index) => (
+              <dl
+                key={`${memory.namespace}-${memory.blobId}-${index}`}
+                className="grid gap-2 rounded-lg bg-black/20 p-4 text-xs sm:grid-cols-[9rem_1fr]"
+              >
+                <Row label="Namespace" value={memory.namespace} />
+                <Row label="Memory text" value={memory.text} />
+                <Row label="Blob ID" value={memory.blobId} />
+                <Row label="Distance" value={String(memory.distance)} />
+              </dl>
+            ))}
+          </div>
+        )}
+        {!!snapshot?.preloadErrors?.length && (
+          <div className="mt-4 space-y-2 text-xs text-red-200">
+            {snapshot.preloadErrors.map((item) => (
+              <p key={item.namespace}>
+                {item.namespace}: {item.error}
+              </p>
+            ))}
+          </div>
+        )}
+      </Card>
       <Card>
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="font-semibold">MemWal health</h2>

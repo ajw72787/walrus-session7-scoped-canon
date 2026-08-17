@@ -81,10 +81,24 @@ export default function CreateCharacter() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "finalize",
           message: `We are creating ${draft.name}. The following character identity is true in every reality. This character setup is final. Extract and save the durable CORE character facts now.\n\n${facts}`,
           history: [],
           namespace,
           activeReality: null,
+          character: {
+            id,
+            name: draft.name,
+            type: draft.type,
+            appearance: draft.appearance,
+            personality: draft.personality,
+            ability: draft.ability,
+            likes: draft.likes,
+            fear: draft.fear,
+            details: draft.details,
+            summary,
+          },
+          world: null,
         }),
       });
       const data = (await response.json()) as {

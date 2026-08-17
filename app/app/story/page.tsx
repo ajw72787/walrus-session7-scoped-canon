@@ -17,11 +17,14 @@ import {
   loadCharacters,
   loadSelection,
   saveSelection,
+  storyConversationStorageKey,
+  storyHistoryStorageKey,
   storySlug,
   type Character,
   type ChatMessage,
   type DebugSnapshot,
   type MemoryJob,
+  type PreloadedCanonMemory,
   type World,
 } from "@/lib/client-state";
 
@@ -30,6 +33,9 @@ type ApiResult = {
   response?: string;
   operations?: DebugSnapshot["operations"];
   jobs?: MemoryJob[];
+  preloadedCanon?: PreloadedCanonMemory[];
+  preloadErrors?: Array<{ namespace: string; error: string }>;
+  writeToolsEnabled?: boolean;
 };
 
 export default function StoryPage() {
@@ -51,9 +57,11 @@ function Story() {
   const [saving, setSaving] = useState(false);
   const [jobs, setJobs] = useState<MemoryJob[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
   const namespace = character ? storySlug(character) : "";
   useEffect(() => {
     const timer = window.setTimeout(() => {
+      setHydrated(false);
       const chars = loadCharacters();
       const selected = loadSelection();
       const characterId = query.get("character") ?? selected.characterId;
@@ -65,15 +73,23 @@ function Story() {
       setWorld(foundWorld);
       if (found && foundWorld)
         saveSelection({ characterId: found.id, worldId: foundWorld.id });
+      const conversationKey =
+        found && foundWorld
+          ? storyConversationStorageKey(found.id, foundWorld.id)
+          : CONVERSATION_STORAGE_KEY;
       const id =
-        sessionStorage.getItem(CONVERSATION_STORAGE_KEY) ??
-        createConversationId();
+        sessionStorage.getItem(conversationKey) ?? createConversationId();
       setConversationId(id);
+      setMessages([]);
+      sessionStorage.setItem(conversationKey, id);
       sessionStorage.setItem(CONVERSATION_STORAGE_KEY, id);
       try {
-        const stored = sessionStorage.getItem(
-          `${STORY_HISTORY_STORAGE_KEY}:${id}`,
-        );
+        const stored =
+          found && foundWorld
+            ? sessionStorage.getItem(
+                storyHistoryStorageKey(found.id, foundWorld.id),
+              )
+            : sessionStorage.getItem(`${STORY_HISTORY_STORAGE_KEY}:${id}`);
         if (stored) setMessages(JSON.parse(stored) as ChatMessage[]);
         const debug = sessionStorage.getItem(DEBUG_STORAGE_KEY);
         if (debug) {
@@ -86,18 +102,24 @@ function Story() {
             setJobs(snapshot.jobs ?? []);
         }
       } catch {}
+      setHydrated(true);
     }, 0);
     return () => window.clearTimeout(timer);
   }, [query]);
   useEffect(() => {
-    if (conversationId)
+    if (hydrated && conversationId && character && world)
       sessionStorage.setItem(
-        `${STORY_HISTORY_STORAGE_KEY}:${conversationId}`,
+        storyHistoryStorageKey(character.id, world.id),
         JSON.stringify(messages),
       );
-  }, [conversationId, messages]);
+  }, [character, conversationId, hydrated, messages, world]);
   const persistDebug = useCallback(
-    (operations: DebugSnapshot["operations"], newJobs: MemoryJob[]) => {
+    (
+      operations: DebugSnapshot["operations"],
+      newJobs: MemoryJob[],
+      action: "continue" | "finalize",
+      data: ApiResult,
+    ) => {
       if (!character || !world) return;
       let previous: DebugSnapshot | null = null;
       try {
@@ -110,8 +132,14 @@ function Story() {
       const snapshot: DebugSnapshot = {
         namespace,
         characterName: character.name,
+        characterSlug: character.id,
         activeReality: world.id,
+        activeRealityName: world.name,
         conversationId,
+        requestAction: action,
+        writeToolsEnabled: data.writeToolsEnabled ?? action === "finalize",
+        preloadedCanon: data.preloadedCanon ?? [],
+        preloadErrors: data.preloadErrors ?? [],
         operations: [
           ...(matching ? (previous?.operations ?? []) : []),
           ...operations,
@@ -119,32 +147,57 @@ function Story() {
         jobs: [...(matching ? (previous?.jobs ?? []) : []), ...newJobs],
       };
       sessionStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(snapshot));
-      setJobs(snapshot.jobs);
+      setJobs(newJobs);
     },
     [character, conversationId, namespace, world],
   );
-  async function request(text: string) {
-    if (!character || !world) return;
+  async function request(
+    text: string,
+    action: "continue" | "finalize",
+    appendUser = true,
+  ) {
+    if (!character || !world) throw new Error("Story context is unavailable.");
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        action,
         message: text,
         history: messages,
         namespace,
         activeReality: world.id,
+        character: {
+          id: character.id,
+          name: character.name,
+          type: character.type,
+          appearance: character.appearance,
+          personality: character.personality,
+          ability: character.ability,
+          likes: character.likes,
+          fear: character.fear,
+          details: character.details,
+          summary: character.summary,
+        },
+        world: {
+          id: world.id,
+          name: world.name,
+          description: world.description,
+          inspiration: world.inspiration,
+        },
       }),
     });
     const data = (await response.json()) as ApiResult;
     if (!response.ok || !data.response)
       throw new Error(data.error ?? "The story couldn’t continue.");
-    const next = [
-      ...messages,
-      { role: "user", content: text },
-      { role: "assistant", content: data.response },
-    ] satisfies ChatMessage[];
-    setMessages(next);
-    persistDebug(data.operations ?? [], data.jobs ?? []);
+    if (action === "continue") {
+      const next = [
+        ...messages,
+        ...(appendUser ? [{ role: "user" as const, content: text }] : []),
+        { role: "assistant" as const, content: data.response },
+      ] satisfies ChatMessage[];
+      setMessages(next);
+    }
+    persistDebug(data.operations ?? [], data.jobs ?? [], action, data);
     return data;
   }
   async function send(event: FormEvent) {
@@ -155,12 +208,26 @@ function Story() {
     setError(null);
     setMessage("");
     try {
-      await request(current);
-    } catch (cause) {
+      await request(current, "continue");
+    } catch {
       setMessage(current);
-      setError(
-        cause instanceof Error ? cause.message : "The story couldn’t continue.",
+      setError("The story got a little stuck. Try again.");
+    } finally {
+      setPending(false);
+    }
+  }
+  async function startAdventure() {
+    if (pending || messages.length) return;
+    setPending(true);
+    setError(null);
+    try {
+      await request(
+        "Begin an interactive adventure for this character in this world. Introduce the setting, involve the character immediately, and end with one simple question.",
+        "continue",
+        false,
       );
+    } catch {
+      setError("The story got a little stuck. Try again.");
     } finally {
       setPending(false);
     }
@@ -170,13 +237,14 @@ function Story() {
     setSaving(true);
     setError(null);
     try {
-      await request(
-        "This story section is final. Save the lasting facts from this part to canon now.",
+      const data = await request(
+        "Finalize the existing story conversation. Extract and save its lasting facts now.",
+        "finalize",
+        false,
       );
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "This part couldn’t be saved.",
-      );
+      if (!data.jobs?.length) throw new Error("No memory jobs were accepted.");
+    } catch {
+      setError("Couldn’t save this part. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -227,11 +295,17 @@ function Story() {
     [jobs],
   );
   function newConversation() {
+    if (!character || !world) return;
     const id = createConversationId();
     setConversationId(id);
     setMessages([]);
     setJobs([]);
+    sessionStorage.setItem(
+      storyConversationStorageKey(character.id, world.id),
+      id,
+    );
     sessionStorage.setItem(CONVERSATION_STORAGE_KEY, id);
+    sessionStorage.removeItem(storyHistoryStorageKey(character.id, world.id));
     sessionStorage.removeItem(DEBUG_STORAGE_KEY);
   }
   if (!character || !world)
@@ -301,10 +375,20 @@ function Story() {
               <div className="text-5xl" aria-hidden="true">
                 💭
               </div>
-              <h2 className="mt-4 text-2xl font-black">What happens next?</h2>
+              <h2 className="mt-4 text-2xl font-black">
+                Ready for an adventure?
+              </h2>
               <p className="mt-2 text-[var(--muted)]">
-                You can write one sentence or a whole scene.
+                The Storyteller will begin with {character.name} in {world.name}
+                .
               </p>
+              <Button
+                className="mt-5"
+                onClick={startAdventure}
+                disabled={pending || saving}
+              >
+                {pending ? "Opening the story…" : "Start the Adventure"}
+              </Button>
             </div>
           </div>
         ) : (
@@ -321,32 +405,34 @@ function Story() {
           ))
         )}
       </Card>
-      <form onSubmit={send} className="space-y-3">
-        <label htmlFor="next" className="text-lg font-black">
-          What happens next?
-        </label>
-        <textarea
-          id="next"
-          rows={3}
-          className="field"
-          placeholder={`${character.name} finds a mysterious door…`}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <div className="flex flex-wrap justify-between gap-3">
-          <Button disabled={pending || saving || !message.trim()}>
-            {pending ? "Thinking…" : "Continue Story"}
-          </Button>
-          <Button
-            type="button"
-            secondary
-            onClick={savePart}
-            disabled={pending || saving || !messages.length}
-          >
-            {saving ? "Saving…" : "Save This Part"}
-          </Button>
-        </div>
-      </form>
+      {!!messages.length && (
+        <form onSubmit={send} className="space-y-3">
+          <label htmlFor="next" className="text-lg font-black">
+            What happens next?
+          </label>
+          <textarea
+            id="next"
+            rows={3}
+            className="field"
+            placeholder={`${character.name} finds a mysterious door…`}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <div className="flex flex-wrap justify-between gap-3">
+            <Button disabled={pending || saving || !message.trim()}>
+              {pending ? "Thinking…" : "Send"}
+            </Button>
+            <Button
+              type="button"
+              secondary
+              onClick={savePart}
+              disabled={pending || saving || !messages.length}
+            >
+              {saving ? "Saving…" : "Save This Part"}
+            </Button>
+          </div>
+        </form>
+      )}
       {error && (
         <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">
           {error}
