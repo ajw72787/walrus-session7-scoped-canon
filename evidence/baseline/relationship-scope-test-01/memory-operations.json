@@ -1,0 +1,69 @@
+{
+  "preflight": [
+    {"namespace":"session7-relationship-scope-test-01::char::pickles","result":[]},
+    {"namespace":"session7-relationship-scope-test-01::char::zorp","result":[]},
+    {"namespace":"session7-relationship-scope-test-01::char::space-world-pickles","result":[]},
+    {"namespace":"session7-relationship-scope-test-01::char::pirate-world-pickles","result":[]},
+    {"namespace":"session7-relationship-scope-test-01::relationships","result":[]},
+    {"namespace":"session7-relationship-scope-test-01::term::space-world","result":[]},
+    {"namespace":"session7-relationship-scope-test-01::term::pirate-world","result":[]}
+  ],
+  "pickles": {
+    "candidate": "[canon:char] Pickles — a purple dragon (as of: current)",
+    "namespace": "session7-relationship-scope-test-01::char::pickles",
+    "dedupRecall": [],
+    "jobId": "3cf202c1-ecc1-4383-9781-32720036d7f2",
+    "blobId": "U1UKSTmiCSV0vG0VvnUZ9DONNGpM7rLQNJgc20jZFC8",
+    "finalState": "completed",
+    "duplicateJob": {
+      "jobId": "574239d1-349c-4343-aa8b-9edf01d36038",
+      "blobId": "wi4thsUq9ZhJJ9geZJRap-Ywu6LKUGtIYJ49hsryvw4",
+      "finalState": "completed"
+    }
+  },
+  "spaceRelationship": {
+    "candidate": "[canon:relationship] Pickles and Zorp — best friends in the alternate reality called Space World (as of: current)",
+    "namespace": "session7-relationship-scope-test-01::relationships",
+    "dedupRecall": [],
+    "accepted": true,
+    "jobId": "701af6d3-1b47-4de8-9f46-97ab3dcc771f",
+    "blobId": "wzvNHP6MLSw9g9kggPwcELQ4DFExu_B7WfVdyZvZvl8",
+    "finalState": "completed",
+    "otherSceneJobs": [
+      {"namespace":"session7-relationship-scope-test-01::char::zorp","jobId":"78c0b7bb-da84-43e0-b4ed-7cf1486813c5","blobId":"-NXVdr6gPlUUXqSSYqfS-_hoMaI1sV0kRxnpd_KMFgc","finalState":"completed","text":"[canon:char] Zorp — a green alien who exists in the alternate reality called Space World (as of: current)"},
+      {"namespace":"session7-relationship-scope-test-01::place::space-world","jobId":"f3d3ef97-1d24-4cc6-a666-8c306c2dd72b","blobId":"WpW1k0bIFrI9n_cvuukynAoiRl7G1WiHDWzUpRyiOH4","finalState":"completed","text":"[canon:place] Space World — an alternate reality inhabited by Zorp and an alternate-reality version of Pickles (as of: current)"}
+    ]
+  },
+  "pirateRelationship": {
+    "namespace": "session7-relationship-scope-test-01::relationships",
+    "candidates": [
+      {
+        "candidate": "[canon:relationship] Pickles and Zorp — have never met in Pirate World (as of: current scene)",
+        "dedupQuery": "[canon:relationship] Pickles and Zorp — have never met in Pirate World (as of: current scene)",
+        "results": [
+          {"blobId":"wzvNHP6MLSw9g9kggPwcELQ4DFExu_B7WfVdyZvZvl8","text":"[canon:relationship] Pickles and Zorp — best friends in the alternate reality called Space World (as of: current)","distance":0.13385820166153783,"namespace":"session7-relationship-scope-test-01::relationships"}
+        ]
+      },
+      {
+        "candidate": "[canon:relationship] Pirate World Pickles–Zorp relationship — strangers; no meeting has ever occurred between them in this reality (as of: current scene)",
+        "dedupQuery": "[canon:relationship] Pirate World Pickles–Zorp relationship — strangers; no meeting has ever occurred between them in this reality (as of: current scene)",
+        "results": [
+          {"blobId":"wzvNHP6MLSw9g9kggPwcELQ4DFExu_B7WfVdyZvZvl8","text":"[canon:relationship] Pickles and Zorp — best friends in the alternate reality called Space World (as of: current)","distance":0.17722621498214397,"namespace":"session7-relationship-scope-test-01::relationships"}
+        ]
+      }
+    ],
+    "accepted": false,
+    "writeSubmitted": false,
+    "jobId": null,
+    "blobId": null,
+    "reason": "Both dedup recalls returned the Space relationship below the prompt's 0.25 duplicate threshold; the relationship candidate was omitted from the submitted facts.",
+    "piratePlaceJob": {
+      "namespace": "session7-relationship-scope-test-01::place::pirate-world",
+      "candidate": "[canon:place] Pirate World — a separate alternate reality from Space World (as of: current scene)",
+      "jobId": "d26f3fce-cd7a-430e-85f3-bfbd7c3e353b",
+      "blobId": "ol0EAbQA68ZxGIQASXkMPm5IPTc_TiPZhWnHJikhVxI",
+      "finalState": "completed"
+    }
+  },
+  "rateLimitError": false
+}
