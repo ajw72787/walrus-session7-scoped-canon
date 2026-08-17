@@ -1,24 +1,25 @@
 import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  ENGINE_LABELS,
+  PROMPT_FILES,
+  resolvePromptMode,
+  type PromptMode,
+} from "@/lib/prompt-config";
 
-export const PROMPT_FILES = {
-  original: "../prompts/continuity-keeper-original.md",
-} as const;
-
-export type PromptMode = keyof typeof PROMPT_FILES;
+export type { PromptMode } from "@/lib/prompt-config";
 
 export function getPromptMode(): PromptMode {
-  const mode = process.env.PROMPT_MODE ?? "original";
-  if (mode !== "original")
-    throw new Error(
-      `Unsupported PROMPT_MODE: ${mode}. Only \"original\" is enabled for the baseline.`,
-    );
-  return mode;
+  return resolvePromptMode(process.env.PROMPT_MODE);
 }
 
 export function getPromptFile() {
   return PROMPT_FILES[getPromptMode()];
+}
+
+export function getEngineLabel() {
+  return ENGINE_LABELS[getPromptMode()];
 }
 
 export async function loadPrompt() {

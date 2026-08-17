@@ -13,6 +13,8 @@ import {
 type Status = {
   promptMode: string;
   promptFile: string;
+  engineLabel: string;
+  scopedCanonEnabled: boolean;
   memwal: {
     configured: boolean;
     serverUrlConfigured: boolean;
@@ -104,7 +106,7 @@ export default function Debug() {
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <Badge>Developer view</Badge>
+        <Badge>Engine: {status?.engineLabel ?? "Loading…"}</Badge>
         <h1 className="text-3xl font-bold">Debug</h1>
         <p className="text-[var(--muted)]">
           Configuration values are status-only; secrets are never returned.
@@ -115,11 +117,16 @@ export default function Debug() {
           <h2 className="mb-4 font-semibold">Runtime</h2>
           <dl className="space-y-3 text-sm">
             <Row label="Prompt mode" value={status?.promptMode ?? "Loading…"} />
+            <Row label="Prompt file" value={status?.promptFile ?? "Loading…"} />
             <Row
-              label="Exact prompt file"
-              value={status?.promptFile ?? "Loading…"}
+              label="Engine label"
+              value={status?.engineLabel ?? "Loading…"}
             />
             <Row label="Namespace" value={namespace} />
+            <Row
+              label="Active reality"
+              value={snapshot?.activeReality ?? "None"}
+            />
             <Row label="Conversation ID" value={conversationId} />
           </dl>
         </Card>
@@ -159,6 +166,22 @@ export default function Debug() {
           </dl>
         </Card>
       </div>
+      {status?.scopedCanonEnabled && (
+        <Card>
+          <h2 className="mb-4 font-semibold">Scoped Canon architecture</h2>
+          <dl className="space-y-3 text-sm">
+            <Row label="Normal recall rule" value="CORE + ACTIVE REALITY" />
+            <Row
+              label="Normal dedup rule"
+              value="Exact applicable scope only"
+            />
+            <Row
+              label="Unrelated reality rule"
+              value="Unrelated realities excluded from normal recall, deduplication, and contradiction checking."
+            />
+          </dl>
+        </Card>
+      )}
       <Card>
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="font-semibold">MemWal health</h2>

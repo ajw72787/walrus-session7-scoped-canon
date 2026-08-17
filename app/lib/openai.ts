@@ -2,6 +2,8 @@ import "server-only";
 import type { ChatMessage, MemoryJob } from "@/lib/client-state";
 import { trackMemoryJob } from "@/lib/memory-jobs";
 import { analyze, recall, remember, rememberBulk } from "@/lib/memwal";
+import { getCanonScopeRoot, isCanonNamespace } from "@/lib/namespaces";
+import type { PromptMode } from "@/lib/prompt";
 type Item = {
   type?: string;
   name?: string;
@@ -19,7 +21,7 @@ export type MemoryToolOperation = {
 const ns = {
   type: "string",
   description:
-    "An exact original Continuity Keeper child namespace. The bare story root is invalid.",
+    "An exact valid Continuity Keeper child namespace for the selected story. The bare story root is invalid.",
 };
 const tools = [
   {
@@ -112,6 +114,8 @@ export async function generateResponse(
   history: ChatMessage[],
   userMessage: string,
   storyNamespace: string,
+  promptMode: PromptMode,
+  activeReality: string | null,
 ) {
   if (!process.env.OPENAI_API_KEY)
     throw new Error(
@@ -130,7 +134,10 @@ export async function generateResponse(
       },
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL ?? "gpt-5-mini",
-        instructions: systemPrompt + installedSdkCompatibility,
+        instructions:
+          systemPrompt +
+          installedSdkCompatibility +
+          `\nRuntime conversation context:\n- Selected story slug: ${storyNamespace}\n- Prompt mode: ${promptMode}\n- Active reality: ${activeReality ?? "none"}\n`,
         input,
         tools,
         tool_choice: "auto",
@@ -185,17 +192,10 @@ function guard(
 ): asserts requested is string {
   if (typeof requested !== "string" || !isCanonNamespace(selected, requested))
     throw new Error(
-      "Namespace must be a valid original Continuity Keeper child of " +
+      "Namespace must be a valid Continuity Keeper child of " +
         selected +
         "; the bare story root is not allowed.",
     );
-}
-
-function isCanonNamespace(selected: string, requested: string): boolean {
-  const prefix = selected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(
-    `^${prefix}::(?:char|place|object|rule|term)::[a-z0-9][a-z0-9'-]*(?:-[a-z0-9][a-z0-9'-]*)*$|^${prefix}::(?:events|timeline|relationships)$`,
-  ).test(requested);
 }
 async function run(
   name: string,
@@ -326,8 +326,9 @@ function requireCandidateNamespace(
         : type === "timeline"
           ? "timeline"
           : `${type}::${entity.toLowerCase().trim().replace(/\s+/g, "-")}`;
-  if (namespace !== `${story}::${suffix}`)
-    throw new Error(`Candidate must be written to ${story}::${suffix}.`);
+  const expected = `${getCanonScopeRoot(story, namespace)}::${suffix}`;
+  if (namespace !== expected)
+    throw new Error(`Candidate must be written to ${expected}.`);
 }
 
 function addJob(

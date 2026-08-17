@@ -2,6 +2,7 @@ export const CHARACTER_STORAGE_KEY = "walrus-s7-character";
 export const NAMESPACE_STORAGE_KEY = "walrus-s7-namespace";
 export const CONVERSATION_STORAGE_KEY = "walrus-s7-conversation";
 export const DEBUG_STORAGE_KEY = "walrus-s7-debug";
+export const ACTIVE_REALITY_STORAGE_KEY = "walrus-s7-active-reality";
 
 export type Character = {
   name: string;
@@ -29,6 +30,7 @@ export type MemoryJob = {
 
 export type DebugSnapshot = {
   namespace: string;
+  activeReality: string | null;
   conversationId: string;
   operations: Array<{
     operation: "recall" | "remember" | "remember_bulk" | "analyze";

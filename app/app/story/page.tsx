@@ -6,12 +6,14 @@ import {
   CONVERSATION_STORAGE_KEY,
   DEBUG_STORAGE_KEY,
   NAMESPACE_STORAGE_KEY,
+  ACTIVE_REALITY_STORAGE_KEY,
   createConversationId,
   type ChatMessage,
   type DebugSnapshot,
 } from "@/lib/client-state";
 
 const defaultNamespace = "walrus-session7-baseline";
+type Status = { promptMode: string; engineLabel: string };
 
 export default function Story() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -21,6 +23,8 @@ export default function Story() {
   const [clientStateLoaded, setClientStateLoaded] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeReality, setActiveReality] = useState<string | null>(null);
+  const [status, setStatus] = useState<Status | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -31,9 +35,18 @@ export default function Story() {
         sessionStorage.getItem(CONVERSATION_STORAGE_KEY) ??
           createConversationId(),
       );
+      setActiveReality(
+        sessionStorage.getItem(ACTIVE_REALITY_STORAGE_KEY) || null,
+      );
       setClientStateLoaded(true);
     }, 0);
     return () => window.clearTimeout(timer);
+  }, []);
+  useEffect(() => {
+    fetch("/api/status")
+      .then((response) => response.json())
+      .then(setStatus)
+      .catch(() => setStatus(null));
   }, []);
   useEffect(() => {
     if (clientStateLoaded && conversationId)
@@ -43,6 +56,12 @@ export default function Story() {
     if (clientStateLoaded)
       sessionStorage.setItem(NAMESPACE_STORAGE_KEY, namespace);
   }, [clientStateLoaded, namespace]);
+  useEffect(() => {
+    if (!clientStateLoaded) return;
+    if (activeReality)
+      sessionStorage.setItem(ACTIVE_REALITY_STORAGE_KEY, activeReality);
+    else sessionStorage.removeItem(ACTIVE_REALITY_STORAGE_KEY);
+  }, [activeReality, clientStateLoaded]);
 
   async function send(event: FormEvent) {
     event.preventDefault();
@@ -59,6 +78,7 @@ export default function Story() {
           message: current,
           history: messages,
           namespace,
+          activeReality,
         }),
       });
       const data = (await result.json()) as {
@@ -78,6 +98,7 @@ export default function Story() {
         DEBUG_STORAGE_KEY,
         JSON.stringify({
           namespace,
+          activeReality,
           conversationId,
           operations: data.operations ?? [],
           jobs: data.jobs ?? [],
@@ -94,6 +115,7 @@ export default function Story() {
     setMessages([]);
     setError(null);
     setConversationId(createConversationId());
+    setActiveReality(null);
     sessionStorage.removeItem(DEBUG_STORAGE_KEY);
   }
 
@@ -101,7 +123,7 @@ export default function Story() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-3">
-          <Badge>Original Continuity Keeper</Badge>
+          <Badge>Engine: {status?.engineLabel ?? "Loading…"}</Badge>
           <h1 className="text-3xl font-bold">Story</h1>
         </div>
         <button
@@ -120,6 +142,20 @@ export default function Story() {
             className="flex-1 rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2 font-mono text-xs"
           />
         </label>
+        {status?.promptMode === "scoped" && (
+          <label className="mt-4 flex flex-col gap-2 text-sm font-medium sm:flex-row sm:items-center">
+            <span>Active reality</span>
+            <input
+              value={activeReality ?? ""}
+              onChange={(event) =>
+                setActiveReality(event.target.value.trim() || null)
+              }
+              placeholder="None"
+              pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+              className="flex-1 rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2 font-mono text-xs"
+            />
+          </label>
+        )}
       </Card>
       <Card className="min-h-[24rem] space-y-4">
         {messages.length === 0 && (

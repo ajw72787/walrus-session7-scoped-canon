@@ -1,8 +1,7 @@
-# Walrus Session 7 Baseline Harness
+# Walrus Session 7 Continuity Keeper Harness
 
-This Next.js App Router application runs the original, unmodified Continuity
-Keeper prompt for the baseline experiment. Scoped Canon is intentionally not
-implemented.
+This Next.js App Router application can run either the original, unmodified
+Continuity Keeper prompt or the completed Scoped Canon prompt.
 
 ## Install and run
 
@@ -18,8 +17,20 @@ The application is available at `http://localhost:3000`.
 ## Environment
 
 Copy `.env.example` to `.env.local` and set `OPENAI_API_KEY` for chat. You may
-set `OPENAI_MODEL`; otherwise the server uses `gpt-5-mini`. `PROMPT_MODE` must
-remain `original`.
+set `OPENAI_MODEL`; otherwise the server uses `gpt-5-mini`. Valid `PROMPT_MODE`
+values are `original` and `scoped`; any other value fails explicitly.
+
+Run original mode:
+
+```bash
+PROMPT_MODE=original npm run dev
+```
+
+Run scoped mode:
+
+```bash
+PROMPT_MODE=scoped npm run dev
+```
 
 MemWal uses `MEMWAL_PRIVATE_KEY`, `MEMWAL_ACCOUNT_ID`, and optionally
 `MEMWAL_SERVER_URL`. Credentials must stay outside the repository. For the
@@ -29,15 +40,16 @@ variables.
 
 ## Pages
 
-- `/` — baseline harness overview
+- `/` — harness overview and active engine
 - `/create` — local/session-only character form with the Pickles example
 - `/story` — chat interface with namespace and local conversation reset
 - `/debug` — safe configuration, recall, blob ID, and health diagnostics
 
-The server loads `../prompts/continuity-keeper-original.md` directly for every
-chat request. Chat attempts a namespace-scoped MemWal recall, then sends the
-recalled context, conversation, and exact original prompt to OpenAI. There is
-no memory-write API route and character submission only updates session state.
+The server loads the prompt selected by `PROMPT_MODE` for every chat request.
+Prompt content remains server-only; safe mode, filename, and engine metadata are
+available through the status and debug views. Character submission and active
+reality selection only update local session state.
 
-Do not implement or activate Scoped Canon until the baseline evidence has been
-captured and reviewed.
+Phase 6A only integrates prompt selection, scoped namespaces, runtime context,
+and UI visibility. It does not run the AFTER test. That preregistered test is
+defined in `../docs/scoped-canon-test-plan.md`.
