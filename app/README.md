@@ -18,7 +18,8 @@ The application is available at `http://localhost:3000`.
 
 Copy `.env.example` to `.env.local` and set `OPENAI_API_KEY` for chat. You may
 set `OPENAI_MODEL`; otherwise the server uses `gpt-5-mini`. Valid `PROMPT_MODE`
-values are `original` and `scoped`; any other value fails explicitly.
+values are `original` and `scoped`; scoped is the product default and any other
+value fails explicitly.
 
 Run original mode:
 
@@ -40,16 +41,17 @@ variables.
 
 ## Pages
 
-- `/` — harness overview and active engine
-- `/create` — local/session-only character form with the Pickles example
-- `/story` — chat interface with namespace and local conversation reset
-- `/debug` — safe configuration, recall, blob ID, and health diagnostics
+- `/` — character shelf
+- `/create` — guided character creation and CORE canon submission
+- `/character/[characterSlug]` — character home and world shelf
+- `/world/create` — deterministic world creation
+- `/story` — child-friendly chat and explicit “Save This Part” finalization
+- `/memories` — readable CORE and Current World recall
+- `/debug` — developer Memory Inspector, job state, and health diagnostics
 
 The server loads the prompt selected by `PROMPT_MODE` for every chat request.
 Prompt content remains server-only; safe mode, filename, and engine metadata are
-available through the status and debug views. Character submission and active
-reality selection only update local session state.
-
-Phase 6A only integrates prompt selection, scoped namespaces, runtime context,
-and UI visibility. It does not run the AFTER test. That preregistered test is
-defined in `../docs/scoped-canon-test-plan.md`.
+available through the status and debug views. Character and world navigation
+metadata lives only in browser storage. MemWal remains the durable canon layer;
+character creation and explicit story-part saves go through the
+prompt-authoritative OpenAI and MemWal workflow.

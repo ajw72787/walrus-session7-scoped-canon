@@ -1,68 +1,152 @@
 "use client";
-
-import { useEffect, useState, type FormEvent } from "react";
-import { Badge, Card } from "@/components/ui";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  Suspense,
+  useState,
+  type FormEvent,
+} from "react";
+import { useSearchParams } from "next/navigation";
+import { ActionLink, Button, Card } from "@/components/ui";
 import {
   CONVERSATION_STORAGE_KEY,
   DEBUG_STORAGE_KEY,
-  NAMESPACE_STORAGE_KEY,
-  ACTIVE_REALITY_STORAGE_KEY,
+  STORY_HISTORY_STORAGE_KEY,
   createConversationId,
+  loadCharacters,
+  loadSelection,
+  saveSelection,
+  storySlug,
+  type Character,
   type ChatMessage,
   type DebugSnapshot,
+  type MemoryJob,
+  type World,
 } from "@/lib/client-state";
 
-const defaultNamespace = "walrus-session7-baseline";
-type Status = { promptMode: string; engineLabel: string };
+type ApiResult = {
+  error?: string;
+  response?: string;
+  operations?: DebugSnapshot["operations"];
+  jobs?: MemoryJob[];
+};
 
-export default function Story() {
+export default function StoryPage() {
+  return (
+    <Suspense fallback={<p>Opening your story…</p>}>
+      <Story />
+    </Suspense>
+  );
+}
+
+function Story() {
+  const query = useSearchParams();
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [world, setWorld] = useState<World | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState("");
-  const [namespace, setNamespace] = useState(defaultNamespace);
   const [conversationId, setConversationId] = useState("");
-  const [clientStateLoaded, setClientStateLoaded] = useState(false);
   const [pending, setPending] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [jobs, setJobs] = useState<MemoryJob[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [activeReality, setActiveReality] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status | null>(null);
-
+  const namespace = character ? storySlug(character) : "";
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      setNamespace(
-        sessionStorage.getItem(NAMESPACE_STORAGE_KEY) ?? defaultNamespace,
-      );
-      setConversationId(
+      const chars = loadCharacters();
+      const selected = loadSelection();
+      const characterId = query.get("character") ?? selected.characterId;
+      const found = chars.find((item) => item.id === characterId) ?? null;
+      const worldId = query.get("world") ?? selected.worldId;
+      const foundWorld =
+        found?.worlds.find((item) => item.id === worldId) ?? null;
+      setCharacter(found);
+      setWorld(foundWorld);
+      if (found && foundWorld)
+        saveSelection({ characterId: found.id, worldId: foundWorld.id });
+      const id =
         sessionStorage.getItem(CONVERSATION_STORAGE_KEY) ??
-          createConversationId(),
-      );
-      setActiveReality(
-        sessionStorage.getItem(ACTIVE_REALITY_STORAGE_KEY) || null,
-      );
-      setClientStateLoaded(true);
+        createConversationId();
+      setConversationId(id);
+      sessionStorage.setItem(CONVERSATION_STORAGE_KEY, id);
+      try {
+        const stored = sessionStorage.getItem(
+          `${STORY_HISTORY_STORAGE_KEY}:${id}`,
+        );
+        if (stored) setMessages(JSON.parse(stored) as ChatMessage[]);
+        const debug = sessionStorage.getItem(DEBUG_STORAGE_KEY);
+        if (debug) {
+          const snapshot = JSON.parse(debug) as DebugSnapshot;
+          if (
+            found &&
+            snapshot.namespace === storySlug(found) &&
+            snapshot.activeReality === foundWorld?.id
+          )
+            setJobs(snapshot.jobs ?? []);
+        }
+      } catch {}
     }, 0);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [query]);
   useEffect(() => {
-    fetch("/api/status")
-      .then((response) => response.json())
-      .then(setStatus)
-      .catch(() => setStatus(null));
-  }, []);
-  useEffect(() => {
-    if (clientStateLoaded && conversationId)
-      sessionStorage.setItem(CONVERSATION_STORAGE_KEY, conversationId);
-  }, [clientStateLoaded, conversationId]);
-  useEffect(() => {
-    if (clientStateLoaded)
-      sessionStorage.setItem(NAMESPACE_STORAGE_KEY, namespace);
-  }, [clientStateLoaded, namespace]);
-  useEffect(() => {
-    if (!clientStateLoaded) return;
-    if (activeReality)
-      sessionStorage.setItem(ACTIVE_REALITY_STORAGE_KEY, activeReality);
-    else sessionStorage.removeItem(ACTIVE_REALITY_STORAGE_KEY);
-  }, [activeReality, clientStateLoaded]);
-
+    if (conversationId)
+      sessionStorage.setItem(
+        `${STORY_HISTORY_STORAGE_KEY}:${conversationId}`,
+        JSON.stringify(messages),
+      );
+  }, [conversationId, messages]);
+  const persistDebug = useCallback(
+    (operations: DebugSnapshot["operations"], newJobs: MemoryJob[]) => {
+      if (!character || !world) return;
+      let previous: DebugSnapshot | null = null;
+      try {
+        const raw = sessionStorage.getItem(DEBUG_STORAGE_KEY);
+        if (raw) previous = JSON.parse(raw) as DebugSnapshot;
+      } catch {}
+      const matching =
+        previous?.namespace === namespace &&
+        previous.activeReality === world.id;
+      const snapshot: DebugSnapshot = {
+        namespace,
+        characterName: character.name,
+        activeReality: world.id,
+        conversationId,
+        operations: [
+          ...(matching ? (previous?.operations ?? []) : []),
+          ...operations,
+        ],
+        jobs: [...(matching ? (previous?.jobs ?? []) : []), ...newJobs],
+      };
+      sessionStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(snapshot));
+      setJobs(snapshot.jobs);
+    },
+    [character, conversationId, namespace, world],
+  );
+  async function request(text: string) {
+    if (!character || !world) return;
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: text,
+        history: messages,
+        namespace,
+        activeReality: world.id,
+      }),
+    });
+    const data = (await response.json()) as ApiResult;
+    if (!response.ok || !data.response)
+      throw new Error(data.error ?? "The story couldn’t continue.");
+    const next = [
+      ...messages,
+      { role: "user", content: text },
+      { role: "assistant", content: data.response },
+    ] satisfies ChatMessage[];
+    setMessages(next);
+    persistDebug(data.operations ?? [], data.jobs ?? []);
+    return data;
+  }
   async function send(event: FormEvent) {
     event.preventDefault();
     const current = message.trim();
@@ -71,135 +155,211 @@ export default function Story() {
     setError(null);
     setMessage("");
     try {
-      const result = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: current,
-          history: messages,
-          namespace,
-          activeReality,
-        }),
-      });
-      const data = (await result.json()) as {
-        error?: string;
-        response?: string;
-        operations?: DebugSnapshot["operations"];
-        jobs?: DebugSnapshot["jobs"];
-      };
-      if (!result.ok || !data.response)
-        throw new Error(data.error ?? "Chat failed.");
-      setMessages([
-        ...messages,
-        { role: "user", content: current },
-        { role: "assistant", content: data.response },
-      ]);
-      sessionStorage.setItem(
-        DEBUG_STORAGE_KEY,
-        JSON.stringify({
-          namespace,
-          activeReality,
-          conversationId,
-          operations: data.operations ?? [],
-          jobs: data.jobs ?? [],
-        } satisfies DebugSnapshot),
-      );
+      await request(current);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Chat failed.");
+      setMessage(current);
+      setError(
+        cause instanceof Error ? cause.message : "The story couldn’t continue.",
+      );
     } finally {
       setPending(false);
     }
   }
-
-  function reset() {
-    setMessages([]);
+  async function savePart() {
+    if (!messages.length || saving) return;
+    setSaving(true);
     setError(null);
-    setConversationId(createConversationId());
-    setActiveReality(null);
+    try {
+      await request(
+        "This story section is final. Save the lasting facts from this part to canon now.",
+      );
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "This part couldn’t be saved.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+  useEffect(() => {
+    if (
+      !namespace ||
+      !jobs.some((job) => !["completed", "failed"].includes(job.state))
+    )
+      return;
+    let cancelled = false;
+    async function poll() {
+      const response = await fetch("/api/memwal/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          namespace,
+          jobIds: jobs.map((job) => job.jobId),
+        }),
+      });
+      const data = (await response.json()) as { jobs?: MemoryJob[] };
+      if (!cancelled && response.ok && data.jobs) {
+        setJobs(data.jobs);
+        const raw = sessionStorage.getItem(DEBUG_STORAGE_KEY);
+        if (raw) {
+          const snapshot = JSON.parse(raw) as DebugSnapshot;
+          snapshot.jobs = data.jobs;
+          sessionStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(snapshot));
+        }
+      }
+    }
+    void poll();
+    const timer = setInterval(poll, 3000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [jobs, namespace]);
+  const saveState = useMemo(
+    () =>
+      jobs.length
+        ? jobs.some((job) => job.state === "failed")
+          ? "failed"
+          : jobs.every((job) => job.state === "completed")
+            ? "complete"
+            : "saving"
+        : null,
+    [jobs],
+  );
+  function newConversation() {
+    const id = createConversationId();
+    setConversationId(id);
+    setMessages([]);
+    setJobs([]);
+    sessionStorage.setItem(CONVERSATION_STORAGE_KEY, id);
     sessionStorage.removeItem(DEBUG_STORAGE_KEY);
   }
-
+  if (!character || !world)
+    return (
+      <Card className="mx-auto max-w-xl text-center">
+        <div className="text-4xl">✦</div>
+        <h1 className="mt-3 text-2xl font-black">
+          Choose a character and a world
+        </h1>
+        <p className="my-4 text-[var(--muted)]">
+          Stories need someone and somewhere to begin.
+        </p>
+        <ActionLink href="/">Go to Character Shelf</ActionLink>
+      </Card>
+    );
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="space-y-3">
-          <Badge>Engine: {status?.engineLabel ?? "Loading…"}</Badge>
-          <h1 className="text-3xl font-bold">Story</h1>
+    <div className="mx-auto max-w-4xl space-y-5">
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="eyebrow">{character.name}</p>
+          <h1 className="text-4xl font-black text-[var(--ink)]">
+            {world.name}
+          </h1>
+          <p className="font-bold text-[var(--purple-dark)]">Current World</p>
         </div>
-        <button
-          onClick={reset}
-          className="rounded-lg border border-[var(--border)] px-3 py-2 text-sm hover:bg-[var(--surface-high)]"
+        <div className="flex gap-2">
+          <ActionLink href={`/character/${character.id}`} secondary>
+            Worlds
+          </ActionLink>
+          <Button secondary onClick={newConversation}>
+            New Part
+          </Button>
+        </div>
+      </header>
+      {query.get("new") && !messages.length && (
+        <div className="rounded-2xl bg-[#fff0c7] p-4">
+          <strong>Welcome to {world.name}!</strong> Tell us what{" "}
+          {character.name} sees or what happens first.
+        </div>
+      )}
+      {saveState === "saving" && (
+        <div role="status" className="rounded-2xl bg-[#fff0c7] p-4 font-bold">
+          Saving… We’re making sure this part is remembered.
+        </div>
+      )}
+      {saveState === "complete" && (
+        <div
+          role="status"
+          className="rounded-2xl bg-[#e8f7ef] p-4 font-bold text-[var(--green)]"
         >
-          Reset local conversation
-        </button>
-      </div>
-      <Card>
-        <label className="flex flex-col gap-2 text-sm font-medium sm:flex-row sm:items-center">
-          <span>Active namespace</span>
-          <input
-            value={namespace}
-            onChange={(e) => setNamespace(e.target.value)}
-            className="flex-1 rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2 font-mono text-xs"
-          />
+          ✓ We’ll remember this.
+        </div>
+      )}
+      {saveState === "failed" && (
+        <div
+          role="alert"
+          className="rounded-2xl bg-red-50 p-4 font-bold text-red-800"
+        >
+          We couldn’t save everything this time. Your story is still here; an
+          adult can check Developer Details.
+        </div>
+      )}
+      <Card className="min-h-[28rem] space-y-4">
+        {!messages.length ? (
+          <div className="grid min-h-80 place-items-center text-center">
+            <div>
+              <div className="text-5xl" aria-hidden="true">
+                💭
+              </div>
+              <h2 className="mt-4 text-2xl font-black">What happens next?</h2>
+              <p className="mt-2 text-[var(--muted)]">
+                You can write one sentence or a whole scene.
+              </p>
+            </div>
+          </div>
+        ) : (
+          messages.map((item, index) => (
+            <article
+              key={index}
+              className={`max-w-[88%] rounded-2xl px-5 py-4 ${item.role === "user" ? "ml-auto bg-[var(--purple)] text-white" : "bg-[var(--surface-high)]"}`}
+            >
+              <p className="mb-1 text-xs font-black uppercase opacity-70">
+                {item.role === "user" ? "You" : "Storyteller"}
+              </p>
+              <p className="leading-7 whitespace-pre-wrap">{item.content}</p>
+            </article>
+          ))
+        )}
+      </Card>
+      <form onSubmit={send} className="space-y-3">
+        <label htmlFor="next" className="text-lg font-black">
+          What happens next?
         </label>
-        {status?.promptMode === "scoped" && (
-          <label className="mt-4 flex flex-col gap-2 text-sm font-medium sm:flex-row sm:items-center">
-            <span>Active reality</span>
-            <input
-              value={activeReality ?? ""}
-              onChange={(event) =>
-                setActiveReality(event.target.value.trim() || null)
-              }
-              placeholder="None"
-              pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-              className="flex-1 rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2 font-mono text-xs"
-            />
-          </label>
-        )}
-      </Card>
-      <Card className="min-h-[24rem] space-y-4">
-        {messages.length === 0 && (
-          <div className="grid min-h-72 place-items-center text-center text-[var(--muted)]">
-            <p>
-              No messages yet.
-              <br />
-              Start a baseline conversation when you are ready.
-            </p>
-          </div>
-        )}
-        {messages.map((item, index) => (
-          <div
-            key={index}
-            className={`max-w-3xl rounded-xl px-4 py-3 ${item.role === "user" ? "ml-auto bg-violet-600" : "bg-[var(--surface-high)]"}`}
-          >
-            <p className="mb-1 text-xs font-semibold uppercase opacity-60">
-              {item.role}
-            </p>
-            <p className="leading-7 whitespace-pre-wrap">{item.content}</p>
-          </div>
-        ))}
-      </Card>
-      <form onSubmit={send} className="flex gap-3">
         <textarea
-          aria-label="Message"
-          rows={2}
+          id="next"
+          rows={3}
+          className="field"
+          placeholder={`${character.name} finds a mysterious door…`}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Write the next story message…"
-          className="flex-1 resize-none rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3"
         />
-        <button
-          disabled={pending || !message.trim()}
-          className="rounded-xl bg-violet-600 px-6 font-semibold hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {pending ? "Sending…" : "Send"}
-        </button>
+        <div className="flex flex-wrap justify-between gap-3">
+          <Button disabled={pending || saving || !message.trim()}>
+            {pending ? "Thinking…" : "Continue Story"}
+          </Button>
+          <Button
+            type="button"
+            secondary
+            onClick={savePart}
+            disabled={pending || saving || !messages.length}
+          >
+            {saving ? "Saving…" : "Save This Part"}
+          </Button>
+        </div>
       </form>
       {error && (
-        <p role="alert" className="text-sm text-amber-300">
+        <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">
           {error}
         </p>
       )}
+      <div className="text-right">
+        <ActionLink
+          href={`/memories?character=${character.id}&world=${world.id}`}
+          secondary
+        >
+          What We Remember
+        </ActionLink>
+      </div>
     </div>
   );
 }

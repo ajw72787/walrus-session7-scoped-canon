@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Badge, Card } from "@/components/ui";
 import {
+  ACTIVE_REALITY_STORAGE_KEY,
   CONVERSATION_STORAGE_KEY,
   DEBUG_STORAGE_KEY,
   NAMESPACE_STORAGE_KEY,
@@ -32,6 +33,7 @@ export default function Debug() {
   const [storedNamespace, setStoredNamespace] = useState("No operation yet.");
   const [storedConversationId, setStoredConversationId] =
     useState("No operation yet.");
+  const [storedReality, setStoredReality] = useState("None");
   const pollNamespace = snapshot?.namespace;
   const jobIds = JSON.stringify(jobs.map((job) => job.jobId));
 
@@ -46,6 +48,9 @@ export default function Debug() {
       );
       setStoredConversationId(
         sessionStorage.getItem(CONVERSATION_STORAGE_KEY) ?? "No operation yet.",
+      );
+      setStoredReality(
+        sessionStorage.getItem(ACTIVE_REALITY_STORAGE_KEY) ?? "None",
       );
       const stored = sessionStorage.getItem(DEBUG_STORAGE_KEY);
       if (stored) {
@@ -109,7 +114,8 @@ export default function Debug() {
         <Badge>Engine: {status?.engineLabel ?? "Loading…"}</Badge>
         <h1 className="text-3xl font-bold">Debug</h1>
         <p className="text-[var(--muted)]">
-          Configuration values are status-only; secrets are never returned.
+          Developer Memory Inspector. Configuration values are status-only;
+          secrets are never returned.
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
@@ -124,8 +130,12 @@ export default function Debug() {
             />
             <Row label="Namespace" value={namespace} />
             <Row
+              label="Character"
+              value={snapshot?.characterName ?? "No character selected"}
+            />
+            <Row
               label="Active reality"
-              value={snapshot?.activeReality ?? "None"}
+              value={snapshot?.activeReality ?? storedReality}
             />
             <Row label="Conversation ID" value={conversationId} />
           </dl>
@@ -180,6 +190,22 @@ export default function Debug() {
               value="Unrelated realities excluded from normal recall, deduplication, and contradiction checking."
             />
           </dl>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            <ScopeBox
+              title="CORE namespaces recalled"
+              namespaces={scopeNamespaces(snapshot, "core")}
+            />
+            <ScopeBox
+              title="ACTIVE REALITY namespaces recalled"
+              namespaces={scopeNamespaces(snapshot, "reality")}
+            />
+            <ScopeBox
+              title="Excluded realities"
+              namespaces={[
+                "All unrelated realities (by normal scoped-recall rule)",
+              ]}
+            />
+          </div>
         </Card>
       )}
       <Card>
@@ -269,6 +295,51 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="grid gap-1 sm:grid-cols-[10rem_1fr]">
       <dt className="text-[var(--muted)]">{label}</dt>
       <dd className="font-mono text-xs break-all">{value}</dd>
+    </div>
+  );
+}
+
+function scopeNamespaces(
+  snapshot: DebugSnapshot | null,
+  scope: "core" | "reality",
+) {
+  const marker =
+    scope === "core"
+      ? "::core::"
+      : `::reality::${snapshot?.activeReality ?? ""}::`;
+  return Array.from(
+    new Set(
+      (snapshot?.operations ?? [])
+        .filter(
+          (item) =>
+            item.operation === "recall" && item.namespace.includes(marker),
+        )
+        .map((item) => item.namespace),
+    ),
+  );
+}
+
+function ScopeBox({
+  title,
+  namespaces,
+}: {
+  title: string;
+  namespaces: string[];
+}) {
+  return (
+    <div className="rounded-xl bg-[var(--surface-high)] p-4">
+      <h3 className="text-sm font-bold">{title}</h3>
+      {namespaces.length ? (
+        <ul className="mt-2 space-y-1 font-mono text-xs break-all">
+          {namespaces.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-xs text-[var(--muted)]">
+          None in the latest snapshot.
+        </p>
+      )}
     </div>
   );
 }

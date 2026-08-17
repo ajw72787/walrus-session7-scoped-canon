@@ -3,12 +3,11 @@ import type { ReactNode } from "react";
 
 export function Badge({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex rounded-full border border-violet-400/40 bg-violet-400/10 px-3 py-1 text-xs font-semibold text-violet-200">
+    <span className="inline-flex rounded-full bg-[#eee8ff] px-3 py-1 text-xs font-black text-[var(--purple-dark)]">
       {children}
     </span>
   );
 }
-
 export function Card({
   children,
   className = "",
@@ -18,28 +17,44 @@ export function Card({
 }) {
   return (
     <section
-      className={`rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-xl shadow-black/10 ${className}`}
+      className={`rounded-3xl border-2 border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_8px_0_rgba(78,57,120,.06)] ${className}`}
     >
       {children}
     </section>
   );
 }
-
 export function ActionLink({
   href,
   children,
   secondary = false,
+  className = "",
 }: {
   href: string;
   children: ReactNode;
   secondary?: boolean;
+  className?: string;
 }) {
   return (
     <Link
       href={href}
-      className={`inline-flex rounded-lg border px-4 py-2.5 text-sm font-semibold ${secondary ? "border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-high)]" : "border-violet-400/20 bg-violet-600 hover:bg-violet-500"}`}
+      className={`inline-flex min-h-12 items-center justify-center rounded-xl border-2 px-5 py-3 font-bold ${secondary ? "border-[var(--border)] bg-white text-[var(--ink)] hover:bg-[var(--surface-high)]" : "border-[var(--purple)] bg-[var(--purple)] text-white hover:border-[var(--purple-dark)] hover:bg-[var(--purple-dark)]"} ${className}`}
     >
       {children}
     </Link>
+  );
+}
+export function Button({
+  children,
+  secondary = false,
+  className = "",
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { secondary?: boolean }) {
+  return (
+    <button
+      {...props}
+      className={`min-h-12 rounded-xl border-2 px-5 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-50 ${secondary ? "border-[var(--border)] bg-white hover:bg-[var(--surface-high)]" : "border-[var(--purple)] bg-[var(--purple)] text-white hover:bg-[var(--purple-dark)]"} ${className}`}
+    >
+      {children}
+    </button>
   );
 }

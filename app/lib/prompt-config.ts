@@ -11,7 +11,7 @@ export const ENGINE_LABELS: Record<PromptMode, string> = {
 };
 
 export function resolvePromptMode(value: string | undefined): PromptMode {
-  const mode = value ?? "original";
+  const mode = value ?? "scoped";
   if (mode !== "original" && mode !== "scoped")
     throw new Error(
       `Unsupported PROMPT_MODE: ${mode}. Valid values are "original" and "scoped".`,

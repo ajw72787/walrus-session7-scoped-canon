@@ -1,103 +1,227 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Badge, Card } from "@/components/ui";
-import { CHARACTER_STORAGE_KEY, type Character } from "@/lib/client-state";
+import { useRouter } from "next/navigation";
+import { ActionLink, Button, Card } from "@/components/ui";
+import {
+  CONVERSATION_STORAGE_KEY,
+  DEBUG_STORAGE_KEY,
+  createConversationId,
+  loadCharacters,
+  saveCharacters,
+  saveSelection,
+  slugify,
+  storySlug,
+  type Character,
+  type DebugSnapshot,
+} from "@/lib/client-state";
 
-const empty: Character = {
+type Draft = Omit<Character, "id" | "summary" | "worlds" | "createdAt">;
+const empty: Draft = {
   name: "",
   type: "",
   appearance: "",
+  personality: "",
   ability: "",
   likes: "",
   fear: "",
   details: "",
 };
-const pickles: Character = {
-  name: "Pickles",
-  type: "Dragon",
-  appearance: "Purple",
-  ability: "Breathes ice instead of fire",
-  likes: "Pizza",
-  fear: "Chickens",
-  details: "",
-};
-const fields: Array<[keyof Character, string, boolean?]> = [
-  ["name", "Name"],
-  ["type", "What are they?"],
-  ["appearance", "Appearance"],
-  ["ability", "Special ability"],
-  ["likes", "Likes"],
-  ["fear", "Fear"],
-  ["details", "Additional details", true],
+const fields: Array<[keyof Draft, string, string]> = [
+  ["name", "Name", "Milo"],
+  ["type", "What are they?", "A tiny cloud, a brave fox…"],
+  [
+    "appearance",
+    "What do they look like?",
+    "Silver fur and a bright red scarf",
+  ],
+  ["personality", "What are they like?", "Curious, kind, and a little silly"],
+  ["likes", "What do they love?", "Moonlight and blueberry pancakes"],
+  ["fear", "What are they afraid of?", "Very loud thunder"],
+  ["ability", "Special abilities", "Can talk to trees"],
+  ["details", "Anything else?", "A favorite saying, a treasured object…"],
 ];
 
 export default function CreateCharacter() {
-  const [character, setCharacter] = useState<Character>(empty);
-  const [saved, setSaved] = useState(false);
+  const router = useRouter();
+  const [draft, setDraft] = useState<Draft>(empty);
+  const [reviewing, setReviewing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const answers = fields.filter(([key]) => draft[key].trim());
 
-  function submit(event: FormEvent) {
+  function review(event: FormEvent) {
     event.preventDefault();
-    sessionStorage.setItem(CHARACTER_STORAGE_KEY, JSON.stringify(character));
-    setSaved(true);
+    setReviewing(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  async function create() {
+    setSaving(true);
+    setError(null);
+    const existing = loadCharacters();
+    const base = slugify(draft.name);
+    const id = existing.some((item) => item.id === base)
+      ? `${base}-${existing.filter((item) => item.id.startsWith(base)).length + 1}`
+      : base;
+    const summary = [draft.type, draft.personality].filter(Boolean).join(" · ");
+    const character: Character = {
+      ...draft,
+      id,
+      summary,
+      worlds: [],
+      createdAt: new Date().toISOString(),
+    };
+    const namespace = storySlug(character);
+    const conversationId = createConversationId();
+    const facts = answers
+      .map(([key, label]) => `${label}: ${draft[key]}`)
+      .join("\n");
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: `We are creating ${draft.name}. The following character identity is true in every reality. This character setup is final. Extract and save the durable CORE character facts now.\n\n${facts}`,
+          history: [],
+          namespace,
+          activeReality: null,
+        }),
+      });
+      const data = (await response.json()) as {
+        error?: string;
+        operations?: DebugSnapshot["operations"];
+        jobs?: DebugSnapshot["jobs"];
+      };
+      if (!response.ok)
+        throw new Error(data.error ?? "We couldn’t create this character.");
+      saveCharacters([...existing, character]);
+      saveSelection({ characterId: id, worldId: null });
+      sessionStorage.setItem(CONVERSATION_STORAGE_KEY, conversationId);
+      sessionStorage.setItem(
+        DEBUG_STORAGE_KEY,
+        JSON.stringify({
+          namespace,
+          characterName: draft.name,
+          activeReality: null,
+          conversationId,
+          operations: data.operations ?? [],
+          jobs: data.jobs ?? [],
+        } satisfies DebugSnapshot),
+      );
+      router.push(`/character/${id}?created=1`);
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "We couldn’t create this character.",
+      );
+      setSaving(false);
+    }
   }
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <div className="space-y-3">
-        <Badge>Local session only</Badge>
-        <h1 className="text-3xl font-bold">Create a character</h1>
-        <p className="text-[var(--muted)]">
-          This form does not write to MemWal.
+  if (reviewing)
+    return (
+      <div className="mx-auto max-w-2xl space-y-6">
+        <header>
+          <p className="eyebrow">Almost ready</p>
+          <h1 className="mt-2 text-4xl font-black text-[var(--ink)]">
+            Here’s who we made…
+          </h1>
+        </header>
+        <Card className="space-y-4">
+          <h2 className="text-3xl font-black text-[var(--purple-dark)]">
+            {draft.name}
+          </h2>
+          <dl className="space-y-3">
+            {answers
+              .filter(([key]) => key !== "name")
+              .map(([key, label]) => (
+                <div key={key}>
+                  <dt className="text-sm font-black text-[var(--muted)]">
+                    {label}
+                  </dt>
+                  <dd className="text-lg">{draft[key]}</dd>
+                </div>
+              ))}
+          </dl>
+        </Card>
+        {error && (
+          <p role="alert" className="rounded-xl bg-red-50 p-4 text-red-800">
+            {error}
+          </p>
+        )}
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={create} disabled={saving}>
+            {saving ? "Creating and saving…" : "Create Character"}
+          </Button>
+          <Button
+            secondary
+            onClick={() => setReviewing(false)}
+            disabled={saving}
+          >
+            Make a Change
+          </Button>
+        </div>
+        <p className="text-sm text-[var(--muted)]">
+          Creating saves these shared character facts to What We Remember.
         </p>
       </div>
+    );
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <header className="space-y-3">
+        <p className="eyebrow">Create a character</p>
+        <h1 className="text-4xl font-black text-[var(--ink)]">
+          Who should we meet?
+        </h1>
+        <p className="text-[var(--muted)]">
+          Just a name is required. Add as much or as little as you like.
+        </p>
+      </header>
       <Card>
-        <form onSubmit={submit} className="space-y-5">
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => {
-                setCharacter(pickles);
-                setSaved(false);
-              }}
-              className="text-sm font-semibold text-violet-300 hover:text-violet-200"
-            >
-              Fill Pickles example
-            </button>
-          </div>
-          {fields.map(([key, label, multiline]) => (
+        <form onSubmit={review} className="space-y-5">
+          {fields.map(([key, label, placeholder]) => (
             <label key={key} className="block space-y-2">
-              <span className="text-sm font-medium">{label}</span>
-              {multiline ? (
+              <span className="font-bold">
+                {label}
+                {key !== "name" && (
+                  <span className="font-normal text-[var(--muted)]">
+                    {" "}
+                    · optional
+                  </span>
+                )}
+              </span>
+              {key === "details" ? (
                 <textarea
-                  rows={4}
-                  value={character[key]}
-                  onChange={(e) => {
-                    setCharacter({ ...character, [key]: e.target.value });
-                    setSaved(false);
-                  }}
-                  className="w-full rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2"
+                  rows={3}
+                  className="field"
+                  placeholder={placeholder}
+                  value={draft[key]}
+                  onChange={(e) =>
+                    setDraft({ ...draft, [key]: e.target.value })
+                  }
                 />
               ) : (
                 <input
-                  required
-                  value={character[key]}
-                  onChange={(e) => {
-                    setCharacter({ ...character, [key]: e.target.value });
-                    setSaved(false);
-                  }}
-                  className="w-full rounded-lg border border-[var(--border)] bg-black/20 px-3 py-2"
+                  required={key === "name"}
+                  className="field"
+                  placeholder={placeholder}
+                  value={draft[key]}
+                  onChange={(e) =>
+                    setDraft({ ...draft, [key]: e.target.value })
+                  }
                 />
               )}
             </label>
           ))}
-          <div className="flex items-center gap-4">
-            <button className="rounded-lg bg-violet-600 px-4 py-2.5 font-semibold hover:bg-violet-500">
-              Save to this session
-            </button>
-            {saved && (
-              <span className="text-sm text-emerald-300">Saved locally.</span>
-            )}
+          <div className="flex flex-wrap gap-3 pt-2">
+            <Button type="submit" disabled={!draft.name.trim()}>
+              See My Character
+            </Button>
+            <ActionLink href="/" secondary>
+              Cancel
+            </ActionLink>
           </div>
         </form>
       </Card>
